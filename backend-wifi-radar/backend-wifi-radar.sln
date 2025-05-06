@@ -1,0 +1,16 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "backend-wifi-radar", "backend-wifi-radar.csproj", "{A54FF0B8-F9D2-4E43-90C7-220887A08115}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{A54FF0B8-F9D2-4E43-90C7-220887A08115}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A54FF0B8-F9D2-4E43-90C7-220887A08115}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A54FF0B8-F9D2-4E43-90C7-220887A08115}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A54FF0B8-F9D2-4E43-90C7-220887A08115}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal
