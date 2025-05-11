@@ -5,7 +5,7 @@ namespace API.Data.Repositories;
 
 public abstract class BaseRepository<T> : ICrudRepository<T> where T : BaseEntity
 {
-    public async Task<T> GetByIdAsync(int id)
+    public async Task<T> GetByIdAsync(string id)
     {
         throw new NotImplementedException();
     }
