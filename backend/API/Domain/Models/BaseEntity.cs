@@ -1,6 +1,12 @@
+using MongoDB.Bson.Serialization.Attributes;
+using MongoDB.Bson;
+
 namespace API.Domain.Models;
 
 public abstract class BaseEntity
 {
-    public int Id { get; set; }
+
+    [BsonId]
+    [BsonRepresentation(BsonType.ObjectId)]
+    public string Id { get; set; }
 }

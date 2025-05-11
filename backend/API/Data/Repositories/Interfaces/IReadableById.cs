@@ -4,5 +4,5 @@ namespace API.Data.Repositories.Interfaces;
 
 public interface IReadableById<T> where T : BaseEntity
 {
-    Task<T> GetByIdAsync(int id);
+    Task<T> GetByIdAsync(string id);
 }
