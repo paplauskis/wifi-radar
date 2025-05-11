@@ -1,5 +1,7 @@
 <template>
-  <v-container class="fill-height d-flex flex-column justify-center align-center text-center py-16 px-4">
+  <v-container
+    class="fill-height d-flex flex-column justify-center align-center text-center py-16 px-4"
+  >
     <v-row justify="center">
       <v-col cols="12">
         <h1 class="text-h2 font-weight-bold mb-2">WiFi Radar</h1>
@@ -7,21 +9,7 @@
           Explore and discover free public Wi-Fi hotspots near you.
         </p>
         <v-form>
-          <v-text-field
-            v-model="searchCity"
-            placeholder="Enter a city to find WiFi hotspots"
-            prepend-inner-icon="mdi-magnify"
-            variant="outlined"
-            density="comfortable"
-            color="primary"
-            rounded
-            hide-details
-            class="mb-4"
-            aria-label="City Search Input"
-          />
-          <v-btn color="primary" size="large" block @click="goToMap">
-            Start Exploring
-          </v-btn>
+          <v-btn color="primary" size="large" block @click="goToMap"> Start Exploring </v-btn>
         </v-form>
       </v-col>
     </v-row>

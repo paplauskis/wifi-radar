@@ -3,27 +3,18 @@
     <v-row no-gutters class="fill-height">
       <v-col cols="12" md="4" class="pa-4 elevation-2" style="z-index: 2; background-color: white">
         <h2 class="text-h6 font-weight-bold mb-2">Nearby Wi-Fi Hotspots</h2>
-        <v-text-field
-          v-model="searchQuery"
-          placeholder="Search by city..."
-          prepend-inner-icon="mdi-magnify"
-          dense
-          variant="outlined"
-        />
 
-        <v-list height="calc(100vh - 200px)" class="overflow-y-auto">
-          <v-list-item
-            v-for="(wifi, index) in wifiPoints"
-            :key="index"
-            :title="wifi.name"
-            :subtitle="wifi.provider"
-            @click="focusHotspot(wifi)"
-          >
-            <template #prepend>
-              <v-icon color="primary">mdi-wifi</v-icon>
-            </template>
-          </v-list-item>
-        </v-list>
+        <v-row class="mt-2" dense>
+          <WifiSearchBar v-model="searchQuery" @clear="clearSearch" />
+        </v-row>
+
+        <div v-if="!selectedWifi">
+          <WifiList :wifiPoints="wifiPoints" @select="selectWifi" />
+        </div>
+
+        <div v-else>
+          <WifiDetails :wifi="selectedWifi" @back="selectedWifi = null" />
+        </div>
       </v-col>
 
       <v-col cols="12" md="8" class="map-container">
@@ -34,37 +25,119 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, watch } from 'vue'
 import L from 'leaflet'
 import 'leaflet/dist/leaflet.css'
+import { geocodeCity } from '@/services/geocoding'
+import { fetchWifiNodes } from '@/services/overpass'
+
+import WifiSearchBar from '@/components/wifi/WifiSearchBar.vue'
+import WifiList from '@/components/wifi/WifiList.vue'
+import WifiDetails from '@/components/wifi/WifiDetails.vue'
 
 const searchQuery = ref('')
-
-const wifiPoints = ref([
-  { id: 1, name: 'Cafe WiFi', lat: 54.6872, lng: 25.2797, password: 'coffeetime' },
-  { id: 2, name: 'Library WiFi', lat: 54.6890, lng: 25.2765, password: null }
-])
+const wifiPoints = ref([])
+const selectedWifi = ref(null)
+const markers = []
 
 let map = null
 
 onMounted(() => {
   map = L.map('map').setView([54.689, 25.2799], 14)
-
   L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
     maxZoom: 19,
-    attribution: 'Map data © <a href="https://openstreetmap.org">OpenStreetMap</a> contributors'
+    attribution: 'Map data © <a href="https://openstreetmap.org">OpenStreetMap</a> contributors',
   }).addTo(map)
-
-  wifiPoints.value.forEach((wifi) => {
-    L.marker([wifi.lat, wifi.lng])
-      .addTo(map)
-      .bindPopup(`<b>${wifi.name}</b><br>${wifi.provider}`)
-  })
 })
 
 const focusHotspot = (wifi) => {
-  map.setView([wifi.lat, wifi.lng], 16)
+  map.setView([wifi.lat, wifi.lng], 17)
 }
+
+const selectWifi = (wifi) => {
+  selectedWifi.value = wifi
+  focusHotspot(wifi)
+
+  const popupHtml = `
+    <div style="max-width: 250px;">
+      <h3 style="margin-bottom: 4px;">${wifi.name}</h3>
+      <p style="margin: 0;"><strong>Provider:</strong> ${wifi.provider}</p>
+      <p style="margin: 0;"><strong>Address:</strong> ${wifi.address}</p>
+      ${wifi.password ? `<p style="margin: 0;"><strong>Password:</strong> ${wifi.password}</p>` : ''}
+    </div>
+  `
+
+  const popup = L.popup({
+    offset: L.point(0, -20),
+  })
+    .setLatLng([wifi.lat, wifi.lng])
+    .setContent(popupHtml)
+    .openOn(map)
+}
+
+const clearSearch = () => {
+  searchQuery.value = ''
+  wifiPoints.value = []
+  selectedWifi.value = null
+  markers.forEach((m) => map.removeLayer(m))
+  markers.length = 0
+}
+
+let debounceTimeout = null
+
+watch(searchQuery, (newQuery) => {
+  clearTimeout(debounceTimeout)
+  if (newQuery.length < 3) return
+
+  debounceTimeout = setTimeout(async () => {
+    const result = await geocodeCity(newQuery)
+    if (result) {
+      map.setView([result.lat, result.lon], 14)
+
+      const hotspots = await fetchWifiNodes(result.lat, result.lon)
+      wifiPoints.value = hotspots.map((node) => {
+        const tags = node.tags || {}
+        const address = [tags['addr:street'], tags['addr:housenumber'], tags['addr:city']]
+          .filter(Boolean)
+          .join(', ')
+
+        return {
+          id: node.id,
+          name: tags.name || 'Unnamed hotspot',
+          provider: tags.operator || 'Unknown provider',
+          password: tags['internet_access:ssid'] || null,
+          address: address || 'No address info',
+          lat: node.lat,
+          lng: node.lon,
+        }
+      })
+
+      window.addEventListener('select-wifi', (e) => {
+        const id = e.detail
+        const match = wifiPoints.value.find((w) => w.id === id)
+        if (match) selectWifi(match)
+      })
+
+      wifiPoints.value.forEach((wifi) => {
+        const popupHtml = `
+          <div style="max-width: 250px;">
+            <h3 style="margin-bottom: 4px;">${wifi.name}</h3>
+            <p style="margin: 0;"><strong>Provider:</strong> ${wifi.provider}</p>
+            <p style="margin: 0;"><strong>Address:</strong> ${wifi.address}</p>
+            ${wifi.password ? `<p style="margin: 0;"><strong>Password:</strong> ${wifi.password}</p>` : ''}
+            <p style="margin-top: 6px;">
+              <a href="#" onclick="window.dispatchEvent(new CustomEvent('select-wifi', { detail: ${wifi.id} }))">
+                View more details →
+              </a>
+            </p>
+          </div>
+        `
+        const marker = L.marker([wifi.lat, wifi.lng]).addTo(map).bindPopup(popupHtml)
+        markers.push(marker)
+      })
+    }
+  }, 500)
+})
 </script>
 
 <style scoped>
@@ -72,7 +145,6 @@ const focusHotspot = (wifi) => {
   position: relative;
   z-index: 1;
 }
-
 #map {
   height: 100%;
   width: 100%;
