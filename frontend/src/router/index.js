@@ -4,13 +4,15 @@ import LoginView from '../views/LoginView.vue'
 import RegisterView from '../views/RegisterView.vue'
 import ProfileView from '../views/ProfileView.vue'
 import MapView from '../views/MapView.vue'
+import PingView from '../views/PingView.vue'
 
 const routes = [
   { path: '/', name: 'Home', component: HomeView },
   { path: '/login', name: 'Login', component: LoginView },
   { path: '/register', name: 'Register', component: RegisterView },
   { path: '/profile', name: 'Profile', component: ProfileView },
-  { path: '/map', name: 'Map', component: MapView }
+  { path: '/map', name: 'Map', component: MapView },
+  { path: '/ping', name: 'Ping', component: PingView },
 ]
 
 const router = createRouter({
