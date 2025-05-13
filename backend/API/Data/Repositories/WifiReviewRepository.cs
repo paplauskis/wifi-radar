@@ -1,9 +1,10 @@
+using API.Data.Repositories.Interfaces;
 using API.Domain.Models;
 using MongoDB.Driver;
 
 namespace API.Data.Repositories;
 
-public class WifiReviewRepository : BaseRepository<WifiReview>
+public class WifiReviewRepository : BaseRepository<WifiReview>, IWifiReviewRepository
 {
     public WifiReviewRepository(IMongoDatabase database) : base(database, "Reviews")
     {

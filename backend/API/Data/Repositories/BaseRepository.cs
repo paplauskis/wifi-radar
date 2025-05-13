@@ -14,26 +14,26 @@ public abstract class BaseRepository<T> : ICrudRepository<T> where T : BaseEntit
         _collection = database.GetCollection<T>(collectionName);
     }
 
-    public async Task<T> GetByIdAsync(string id)
+    public virtual async Task<T?> GetByIdAsync(string id)
     {
         var filter = Builders<T>.Filter.Eq(e => e.Id, id);
         return await _collection.Find(filter).FirstOrDefaultAsync();
     }
 
-    public async Task<T> AddAsync(T entity)
+    public virtual async Task<T> AddAsync(T entity)
     {
         entity.Id ??= ObjectId.GenerateNewId().ToString();
         await _collection.InsertOneAsync(entity);
         return entity;
     }
 
-    public async Task DeleteAsync(T entityToBeDeleted)
+    public virtual async Task DeleteAsync(T entityToBeDeleted)
     {
         var filter = Builders<T>.Filter.Eq(e => e.Id, entityToBeDeleted.Id);
         await _collection.DeleteOneAsync(filter); 
     }
 
-    public async Task<T> UpdateAsync(T entityToBeUpdated)
+    public virtual async Task<T> UpdateAsync(T entityToBeUpdated)
     {
         var filter = Builders<T>.Filter.Eq(e => e.Id, entityToBeUpdated.Id);
         await _collection.ReplaceOneAsync(filter, entityToBeUpdated);
