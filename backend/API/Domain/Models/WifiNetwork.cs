@@ -2,7 +2,7 @@ using MongoDB.Bson.Serialization.Attributes;
 
 namespace API.Domain.Models;
 
-public class Wifi : TimeStampedEntity
+public class WifiNetwork : TimeStampedEntity
 {
     [BsonElement("UserID")]
     public int UserId { get; set; }
