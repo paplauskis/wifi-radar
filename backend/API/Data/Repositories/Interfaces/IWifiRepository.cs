@@ -2,7 +2,7 @@ using API.Domain.Models;
 
 namespace API.Data.Repositories.Interfaces;
 
-public interface IWifiRepository : ICrudRepository<Wifi>
+public interface IWifiRepository : ICrudRepository<WifiNetwork>
 {
-    Task<List<Wifi>> GetByCityAsync(string city);
+    Task<List<WifiNetwork>> GetByCityAsync(string city);
 }
