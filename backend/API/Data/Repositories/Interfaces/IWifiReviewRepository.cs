@@ -2,7 +2,7 @@ using API.Domain.Models;
 
 namespace API.Data.Repositories.Interfaces;
 
-public interface IWifiReviewRepository
+public interface IWifiReviewRepository : ICrudRepository<WifiReview>
 {
     Task AddReviewAsync(WifiReview review);
 
