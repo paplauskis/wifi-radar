@@ -1,9 +1,10 @@
+using API.Data.Repositories.Interfaces;
 using API.Domain.Models;
 using MongoDB.Driver;
 
 namespace API.Data.Repositories;
 
-public class UserRepository : BaseRepository<User>
+public class UserRepository : BaseRepository<User>, IUserRepository
 {
     public UserRepository(IMongoDatabase database) : base(database, "Users")
     {
