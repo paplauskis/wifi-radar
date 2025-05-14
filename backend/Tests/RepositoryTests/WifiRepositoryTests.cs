@@ -41,6 +41,24 @@ public class WifiRepositoryTests
         Assert.Equal(insertedEntityCount, count);
     }
 
+    [Fact]
+    public async Task AddAsync_ShouldGenerateNewId_WhenIdIsNull()
+    {
+        using var context = new TestDbContext(CollectionName);
+        var repo = GetRepository(context);
+        var collection = context.Database.GetCollection<WifiNetwork>(CollectionName);
+
+        var entityToBeInserted = _testData.First();
+        entityToBeInserted.Id = null!;
+        await repo.AddAsync(entityToBeInserted);
+
+        var fetchedEntityList = await collection.Find(_ => true).ToListAsync();
+        var count = await collection.CountDocumentsAsync(new BsonDocument());
+        
+        Assert.Single(fetchedEntityList);
+        Assert.NotNull(fetchedEntityList[0].Id);
+    }
+
     private WifiRepository GetRepository(TestDbContext context)
     {
         var services = new ServiceCollection();
