@@ -1,0 +1,57 @@
+[
+  {
+    "UserID": "64c8aaf793c3e1a1f6f884f2",
+    "Country": "Lithuania",
+    "City": "Vilnius",
+    "SpotName": "Caffeine",
+    "StreetName": "J. Jasinskio g.",
+    "BuildingNumber": 56,
+    "ZIPCode": 90178,
+    "IsFree": true,
+    "Password": null
+  },
+  {
+    "UserID": "64c8aaf793c3e1a1f6f884f3",
+    "Country": "Lithuania",
+    "City": "Vilnius",
+    "SpotName": "Coffee Inn",
+    "StreetName": "Gedimino pr.",
+    "BuildingNumber": 12,
+    "ZIPCode": 91103,
+    "IsFree": true,
+    "Password": null
+  },
+  {
+    "UserID": "64c8aaf793c3e1a1f6f884f4",
+    "Country": "Lithuania",
+    "City": "Vilnius",
+    "SpotName": "Starbucks",
+    "StreetName": "Konstitucijos pr.",
+    "BuildingNumber": 7,
+    "ZIPCode": 99308,
+    "IsFree": false,
+    "Password": "star123"
+  },
+  {
+    "UserID": "64c8aaf793c3e1a1f6f884f5",
+    "Country": "Lithuania",
+    "City": "Vilnius",
+    "SpotName": "Narvesen",
+    "StreetName": "Ozo g.",
+    "BuildingNumber": 18,
+    "ZIPCode": 98243,
+    "IsFree": true,
+    "Password": null
+  },
+  {
+    "UserID": "64c8aaf793c3e1a1f6f884a4",
+    "Country": "Lithuania",
+    "City": "Vilnius",
+    "SpotName": "Iki Express",
+    "StreetName": "Pylimo g.",
+    "BuildingNumber": 21,
+    "ZIPCode": 91118,
+    "IsFree": false,
+    "Password": "wifi-iki"
+  }
+]
