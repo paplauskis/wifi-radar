@@ -1,0 +1,82 @@
+[
+  {
+    "Id": "642b65a76fc09b0a847fbd69",
+    "DateCreated": "2025-05-14T10:00:00Z",
+    "WifiNetworkID": "64c8aaf793c3e1a1f6f884f1",
+    "UserID": "64c8aaf793c3e1a1f6f884a1",
+    "Comment": "Great connection and speed. Perfect for working remotely.",
+    "Rating": 10
+  },
+  {
+    "Id": "642b65a76fc09b0a847fbd6a",
+    "DateCreated": "2025-05-14T10:00:00Z",
+    "WifiNetworkID": "64c8aaf793c3e1a1f6f884f2",
+    "UserID": "64c8aaf793c3e1a1f6f884a2",
+    "Comment": "Pretty decent, but the signal drops occasionally.",
+    "Rating": 7
+  },
+  {
+    "Id": "642b65a76fc09b0a847fbd6b",
+    "DateCreated": "2025-05-14T10:00:00Z",
+    "WifiNetworkID": "64c8aaf793c3e1a1f6f884f3",
+    "UserID": "64c8aaf793c3e1a1f6f884a3",
+    "Comment": "Slow and unreliable, wouldn't recommend.",
+    "Rating": 2
+  },
+  {
+    "Id": "642b65a76fc09b0a847fbd6c",
+    "DateCreated": "2025-05-14T10:00:00Z",
+    "WifiNetworkID": "64c8aaf793c3e1a1f6f884f4",
+    "UserID": "64c8aaf793c3e1a1f6f884a4",
+    "Comment": null,
+    "Rating": 6
+  },
+  {
+    "Id": "642b65a76fc09b0a847fbd6d",
+    "DateCreated": "2025-05-14T10:00:00Z",
+    "WifiNetworkID": "64c8aaf793c3e1a1f6f884f5",
+    "UserID": "64c8aaf793c3e1a1f6f884a5",
+    "Comment": "Excellent location and strong signal!",
+    "Rating": 10
+  },
+  {
+    "Id": "642b65a76fc09b0a847fbd6e",
+    "DateCreated": "2025-05-14T10:00:00Z",
+    "WifiNetworkID": "64c8aaf793c3e1a1f6f884f6",
+    "UserID": "64c8aaf793c3e1a1f6f884a6",
+    "Comment": "Solid performance, no issues throughout the day.",
+    "Rating": 9
+  },
+  {
+    "Id": "642b65a76fc09b0a847fbd6f",
+    "DateCreated": "2025-05-14T10:00:00Z",
+    "WifiNetworkID": "64c8aaf793c3e1a1f6f884f7",
+    "UserID": "64c8aaf793c3e1a1f6f884a7",
+    "Comment": "Password-protected but very reliable once connected.",
+    "Rating": 8
+  },
+  {
+    "Id": "642b65a76fc09b0a847fbd70",
+    "DateCreated": "2025-05-14T10:00:00Z",
+    "WifiNetworkID": "64c8aaf793c3e1a1f6f884f8",
+    "UserID": "64c8aaf793c3e1a1f6f884a8",
+    "Comment": "Had trouble connecting, staff helped quickly.",
+    "Rating": 6
+  },
+  {
+    "Id": "642b65a76fc09b0a847fbd71",
+    "DateCreated": "2025-05-14T10:00:00Z",
+    "WifiNetworkID": "64c8aaf793c3e1a1f6f884f9",
+    "UserID": "64c8aaf793c3e1a1f6f884a9",
+    "Comment": "Perfect for checking email and quick browsing.",
+    "Rating": 7
+  },
+  {
+    "Id": "642b65a76fc09b0a847fbd72",
+    "DateCreated": "2025-05-14T10:00:00Z",
+    "WifiNetworkID": "64c8aaf793c3e1a1f6f884ff",
+    "UserID": "64c8aaf793c3e1a1f6f884aa",
+    "Comment": "Weak signal in the back rooms.",
+    "Rating": 4
+  }
+]
