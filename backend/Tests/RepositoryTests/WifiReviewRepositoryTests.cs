@@ -25,44 +25,54 @@ public class WifiReviewRepositoryTests: BaseRepositoryTests<WifiReview, WifiRevi
     [InlineData(9)]
     public override async Task AddAsync_ShouldInsertEntityIntoCollection(int num)
     {
-        _context = new TestDbContext(CollectionName);
-        _repo = GetRepository(_context);
-        _collection = _context.Database.GetCollection<WifiReview>(CollectionName);
+        try
+        {
+            _context = new TestDbContext(CollectionName);
+            _repo = GetRepository(_context);
+            _collection = _context.Database.GetCollection<WifiReview>(CollectionName);
 
-        var insertedEntity = await _repo.AddAsync(_testData[num]);
+            var insertedEntity = await _repo.AddAsync(_testData[num]);
 
-        var fetchedEntity = await _collection
-            .Find(e => e.Id == insertedEntity.Id)
-            .FirstOrDefaultAsync();
-        
-        Assert.Equal(insertedEntity.Id, fetchedEntity.Id);
-        Assert.Equal(insertedEntity.UserId, fetchedEntity.UserId);
-        Assert.Equal(insertedEntity.WifiId, fetchedEntity.WifiId);
-        Assert.Equal(insertedEntity.Text, fetchedEntity.Text);
-        Assert.Equal(insertedEntity.Rating, fetchedEntity.Rating);
-        
-        _context.Dispose();
+            var fetchedEntity = await _collection
+                .Find(e => e.Id == insertedEntity.Id)
+                .FirstOrDefaultAsync();
+
+            Assert.Equal(insertedEntity.Id, fetchedEntity.Id);
+            Assert.Equal(insertedEntity.UserId, fetchedEntity.UserId);
+            Assert.Equal(insertedEntity.WifiId, fetchedEntity.WifiId);
+            Assert.Equal(insertedEntity.Text, fetchedEntity.Text);
+            Assert.Equal(insertedEntity.Rating, fetchedEntity.Rating);
+        }
+        finally
+        {
+            _context?.Dispose(); 
+        }
     }
 
     [Theory]
     [MemberData(nameof(ValidObjects))]
     public override async Task GetByIdAsync_ShouldReturnCorrectEntity_WhenIdExists(WifiReview entity)
     {
-        _context = new TestDbContext(CollectionName);
-        _repo = GetRepository(_context);
-        _collection = _context.Database.GetCollection<WifiReview>(CollectionName);
+        try
+        {
+            _context = new TestDbContext(CollectionName);
+            _repo = GetRepository(_context);
+            _collection = _context.Database.GetCollection<WifiReview>(CollectionName);
 
-        var insertedEntity = await _repo.AddAsync(entity);
-        var fetchedEntity = await _repo.GetByIdAsync(entity.Id);
+            var insertedEntity = await _repo.AddAsync(entity);
+            var fetchedEntity = await _repo.GetByIdAsync(entity.Id);
 
-        Assert.NotNull(fetchedEntity);
-        Assert.Equal(insertedEntity.Id, fetchedEntity.Id);
-        Assert.Equal(insertedEntity.UserId, fetchedEntity.UserId);
-        Assert.Equal(insertedEntity.WifiId, fetchedEntity.WifiId);
-        Assert.Equal(insertedEntity.Text, fetchedEntity.Text);
-        Assert.Equal(insertedEntity.Rating, fetchedEntity.Rating);
-        
-        _context.Dispose();
+            Assert.NotNull(fetchedEntity);
+            Assert.Equal(insertedEntity.Id, fetchedEntity.Id);
+            Assert.Equal(insertedEntity.UserId, fetchedEntity.UserId);
+            Assert.Equal(insertedEntity.WifiId, fetchedEntity.WifiId);
+            Assert.Equal(insertedEntity.Text, fetchedEntity.Text);
+            Assert.Equal(insertedEntity.Rating, fetchedEntity.Rating);   
+        }
+        finally
+        {
+            _context?.Dispose(); 
+        }
     }
 
     protected override WifiReviewRepository GetRepository(TestDbContext context)
