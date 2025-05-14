@@ -115,6 +115,28 @@ public class UserRepositoryTests : BaseRepositoryTests<User, UserRepository>
             _context?.Dispose();
         }
     }
+    
+    [Theory]
+    [InlineData(null)]
+    [InlineData("")]
+    [InlineData("   ")]
+    public async Task GetByUsernameAsync_ShouldReturnNull_WhenUsernameIsNullOrEmpty(string? username)
+    {
+        try
+        {
+            _context = new TestDbContext(CollectionName);
+            _repo = GetRepository(_context);
+            _collection = _context.Database.GetCollection<User>(CollectionName);
+            
+            var result = await _repo.GetByUsernameAsync(username);
+
+            Assert.Null(result);
+        }
+        finally
+        {
+            _context?.Dispose();
+        }
+    }
 
     protected override UserRepository GetRepository(TestDbContext context)
     {
