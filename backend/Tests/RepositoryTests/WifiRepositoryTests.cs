@@ -16,28 +16,39 @@ public class WifiRepositoryTests
     private WifiRepository? _repo;
     private IMongoCollection<WifiNetwork>? _collection;
     
-    [Fact]
-    public async Task AddAsync_ShouldInsertEntityIntoCollection()
+    [Theory]
+    [InlineData(0)]
+    [InlineData(1)]
+    [InlineData(2)]
+    [InlineData(3)]
+    [InlineData(4)]
+    [InlineData(5)]
+    [InlineData(6)]
+    [InlineData(7)]
+    [InlineData(8)]
+    [InlineData(9)]
+    public async Task AddAsync_ShouldInsertEntityIntoCollection(int num)
     {
         _context = new TestDbContext(CollectionName);
         _repo = GetRepository(_context);
         _collection = _context.Database.GetCollection<WifiNetwork>(CollectionName);
 
-        var insertedEntityCount = _testData.Count / 2;
+        var insertedEntity = await _repo.AddAsync(_testData[num]);
 
-        for (int i = 1; i <= insertedEntityCount; i++)
-        {
-            var insertedEntity = await _repo.AddAsync(_testData[i]);
-
-            var fetchedEntity = await _collection
-                .Find(e => e.Id == insertedEntity.Id)
-                .FirstOrDefaultAsync();
-            
-            Assert.Equal(insertedEntity.Id, fetchedEntity.Id);
-        }
+        var fetchedEntity = await _collection
+            .Find(e => e.Id == insertedEntity.Id)
+            .FirstOrDefaultAsync();
         
-        var count = await _collection.CountDocumentsAsync(new BsonDocument());
-        Assert.Equal(insertedEntityCount, count);
+        Assert.Equal(insertedEntity.Id, fetchedEntity.Id);
+        Assert.Equal(insertedEntity.UserId, fetchedEntity.UserId);
+        Assert.Equal(insertedEntity.Country, fetchedEntity.Country);
+        Assert.Equal(insertedEntity.City, fetchedEntity.City);
+        Assert.Equal(insertedEntity.PlaceName, fetchedEntity.PlaceName);
+        Assert.Equal(insertedEntity.Street, fetchedEntity.Street);
+        Assert.Equal(insertedEntity.BuildingNumber, fetchedEntity.BuildingNumber);
+        Assert.Equal(insertedEntity.PostalCode, fetchedEntity.PostalCode);
+        Assert.Equal(insertedEntity.IsFree, fetchedEntity.IsFree);
+        Assert.Equal(insertedEntity.Password, fetchedEntity.Password);
         
         _context.Dispose();
     }
