@@ -1,29 +1,39 @@
 [
   {
+    "Id": "64c8aaf793c3e1a1f6f884a1",
+    "DateCreated": "2025-05-14T10:00:00Z",
     "WifiNetworkID": "64c8aaf793c3e1a1f6f884a1",
     "UserID": "64c8aaf793c3e1a1f6f884f2",
     "Comment": "Great connection and speed. Perfect for working remotely.",
     "Rating": 10
   },
   {
+    "Id": "64c8aaf793c3e1a1f6f884a2",
+    "DateCreated": "2025-05-14T10:00:00Z",
     "WifiNetworkID": "64c8aaf793c3e1a1f6f884a1",
     "UserID": "64c8aaf793c3e1a1f6f884f3",
     "Comment": "Pretty decent, but the signal drops occasionally.",
     "Rating": 7
   },
   {
+    "Id": "64c8aaf793c3e1a1f6f884a3",
+    "DateCreated": "2025-05-14T10:00:00Z",
     "WifiNetworkID": "64c8aaf793c3e1a1f6f884a2",
     "UserID": "64c8aaf793c3e1a1f6f884f4",
     "Comment": "Slow and unreliable, wouldn't recommend.",
     "Rating": 2
   },
   {
+    "Id": "64c8aaf793c3e1a1f6f884a4",
+    "DateCreated": "2025-05-14T10:00:00Z",
     "WifiNetworkID": "64c8aaf793c3e1a1f6f884a3",
     "UserID": "64c8aaf793c3e1a1f6f884f5",
     "Comment": null,
     "Rating": 6
   },
   {
+    "Id": "64c8aaf793c3e1a1f6f884a5",
+    "DateCreated": "2025-05-14T10:00:00Z",
     "WifiNetworkID": "64c8aaf793c3e1a1f6f884a4",
     "UserID": "64c8aaf793c3e1a1f6f884f6",
     "Comment": "Excellent location and strong signal!",
