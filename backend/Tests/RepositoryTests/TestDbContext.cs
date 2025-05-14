@@ -21,6 +21,27 @@ public class TestDbContext : IDisposable
         MongoClient client = new MongoClient(_runner.ConnectionString);
         Database = client.GetDatabase(DatabaseName);
     }
+    
+    public void ImportTestData<T>()
+    {
+        var filePath = GetFilePath($"{typeof(T).Name}TestData.json");
+        var jsonData = File.ReadAllText(filePath);
+        var objectList = JsonConvert.DeserializeObject<List<T>>(jsonData);
+        var collection = Database.GetCollection<T>(_collection);
+        
+        collection.InsertMany(objectList);
+    }
+    
+    private string GetFilePath(string file)
+    {
+        return Path.GetFullPath(Path.Combine(
+            AppContext.BaseDirectory,
+            "..",
+            "..",
+            "..",
+            "TestData",
+            file));
+    }
 
     public void Dispose()
     {
