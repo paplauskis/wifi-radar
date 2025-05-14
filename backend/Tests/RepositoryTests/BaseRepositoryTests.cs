@@ -23,7 +23,7 @@ public abstract class BaseRepositoryTests<TEntity, TRepository>
     }
     
     public static IEnumerable<object[]> ValidObjects =>
-        JsonHelper.GetPocoObjects<WifiNetwork>()
+        JsonHelper.GetPocoObjects<TEntity>()
             .Take(10)
             .Select(w => new object[] { w });
     
