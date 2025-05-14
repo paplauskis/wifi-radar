@@ -1,3 +1,4 @@
+using System.Diagnostics.CodeAnalysis;
 using API.Data.Repositories;
 using API.Domain.Models;
 using Microsoft.Extensions.DependencyInjection;
@@ -31,22 +32,13 @@ public class WifiRepositoryTests : BaseRepositoryTests<WifiNetwork, WifiReposito
             _repo = GetRepository(_context);
             _collection = _context.Database.GetCollection<WifiNetwork>(CollectionName);
 
-            var insertedEntity = await _repo.AddAsync(_testData[num]);
+            var expected = await _repo.AddAsync(_testData[num]);
 
-            var fetchedEntity = await _collection
-                .Find(e => e.Id == insertedEntity.Id)
+            var actual = await _collection
+                .Find(e => e.Id == expected.Id)
                 .FirstOrDefaultAsync();
         
-            Assert.Equal(insertedEntity.Id, fetchedEntity.Id);
-            Assert.Equal(insertedEntity.UserId, fetchedEntity.UserId);
-            Assert.Equal(insertedEntity.Country, fetchedEntity.Country);
-            Assert.Equal(insertedEntity.City, fetchedEntity.City);
-            Assert.Equal(insertedEntity.PlaceName, fetchedEntity.PlaceName);
-            Assert.Equal(insertedEntity.Street, fetchedEntity.Street);
-            Assert.Equal(insertedEntity.BuildingNumber, fetchedEntity.BuildingNumber);
-            Assert.Equal(insertedEntity.PostalCode, fetchedEntity.PostalCode);
-            Assert.Equal(insertedEntity.IsFree, fetchedEntity.IsFree);
-            Assert.Equal(insertedEntity.Password, fetchedEntity.Password);
+            AssertWifiNetworkValuesEqual(expected, actual);
         }
         finally
         {
@@ -68,16 +60,7 @@ public class WifiRepositoryTests : BaseRepositoryTests<WifiNetwork, WifiReposito
             var fetchedEntity = await _repo.GetByIdAsync(entity.Id);
 
             Assert.NotNull(fetchedEntity);
-            Assert.Equal(insertedEntity.Id, fetchedEntity.Id);
-            Assert.Equal(insertedEntity.UserId, fetchedEntity.UserId);
-            Assert.Equal(insertedEntity.Country, fetchedEntity.Country);
-            Assert.Equal(insertedEntity.City, fetchedEntity.City);
-            Assert.Equal(insertedEntity.PlaceName, fetchedEntity.PlaceName);
-            Assert.Equal(insertedEntity.Street, fetchedEntity.Street);
-            Assert.Equal(insertedEntity.BuildingNumber, fetchedEntity.BuildingNumber);
-            Assert.Equal(insertedEntity.PostalCode, fetchedEntity.PostalCode);
-            Assert.Equal(insertedEntity.IsFree, fetchedEntity.IsFree);
-            Assert.Equal(insertedEntity.Password, fetchedEntity.Password);
+            AssertWifiNetworkValuesEqual(insertedEntity, fetchedEntity);
         }
         finally
         {
@@ -111,23 +94,14 @@ public class WifiRepositoryTests : BaseRepositoryTests<WifiNetwork, WifiReposito
 
             var entityList = await _repo.GetByCityAsync(city);
             
-            var orderedEntityList = entityList.OrderBy(e => e.Id).ToList();
-            var orderedCorrectEntityList = correctEntityList.OrderBy(e => e.Id).ToList();
+            var actualEntityList = entityList.OrderBy(e => e.Id).ToList();
+            var expectedEntityList = correctEntityList.OrderBy(e => e.Id).ToList();
 
             Assert.Equal(entityList.Count, expectedCount);
 
             for (int i = 0; i < expectedCount; i++)
             {
-                Assert.Equal(orderedCorrectEntityList[i].Id, orderedEntityList[i].Id);
-                Assert.Equal(orderedCorrectEntityList[i].UserId, orderedEntityList[i].UserId);
-                Assert.Equal(orderedCorrectEntityList[i].Country, orderedEntityList[i].Country);
-                Assert.Equal(orderedCorrectEntityList[i].City, orderedEntityList[i].City);
-                Assert.Equal(orderedCorrectEntityList[i].PlaceName, orderedEntityList[i].PlaceName);
-                Assert.Equal(orderedCorrectEntityList[i].Street, orderedEntityList[i].Street);
-                Assert.Equal(orderedCorrectEntityList[i].BuildingNumber, orderedEntityList[i].BuildingNumber);
-                Assert.Equal(orderedCorrectEntityList[i].PostalCode, orderedEntityList[i].PostalCode);
-                Assert.Equal(orderedCorrectEntityList[i].IsFree, orderedEntityList[i].IsFree);
-                Assert.Equal(orderedCorrectEntityList[i].Password, orderedEntityList[i].Password);
+                AssertWifiNetworkValuesEqual(expectedEntityList[i], actualEntityList[i]);
             }
         }
         finally
@@ -143,5 +117,19 @@ public class WifiRepositoryTests : BaseRepositoryTests<WifiNetwork, WifiReposito
         services.AddScoped<WifiRepository>();
         var serviceProvider = services.BuildServiceProvider();
         return serviceProvider.GetRequiredService<WifiRepository>();
+    }
+
+    private static void AssertWifiNetworkValuesEqual(WifiNetwork expected, WifiNetwork actual)
+    {
+        Assert.Equal(expected.Id, actual.Id);
+        Assert.Equal(expected.UserId, actual.UserId);
+        Assert.Equal(expected.Country, actual.Country);
+        Assert.Equal(expected.City, actual.City);
+        Assert.Equal(expected.PlaceName, actual.PlaceName);
+        Assert.Equal(expected.Street, actual.Street);
+        Assert.Equal(expected.BuildingNumber, actual.BuildingNumber);
+        Assert.Equal(expected.PostalCode, actual.PostalCode);
+        Assert.Equal(expected.IsFree, actual.IsFree);
+        Assert.Equal(expected.Password, actual.Password);
     }
 }
