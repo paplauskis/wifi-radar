@@ -90,7 +90,10 @@ public class WifiRepositoryTests : BaseRepositoryTests<WifiNetwork, WifiReposito
     [InlineData("Kaunas", 3)]
     [InlineData("Klaipėda", 2)]
     [InlineData("Alytus", 0)]
-    public async Task GetByCityAsync_ShouldReturnCorrectEntities_WhenCityMatches(string city, int expectedCount)
+    [InlineData("", 0)]
+    [InlineData("  ", 0)]
+    [InlineData(null, 0)]
+    public async Task GetByCityAsync_ShouldReturnCorrectEntities_WhenCityMatches(string? city, int expectedCount)
     {
         try
         {
