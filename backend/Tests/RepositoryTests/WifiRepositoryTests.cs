@@ -20,7 +20,25 @@ public class WifiRepositoryTests
     [Fact]
     public async Task AddAsync_ShouldInsertEntityIntoCollection()
     {
+        using var context = new TestDbContext(CollectionName);
+        var repo = GetRepository(context);
+        var collection = context.Database.GetCollection<WifiNetwork>(CollectionName);
+
+        var insertedEntityCount = _testData.Count / 2;
+
+        for (int i = 1; i <= insertedEntityCount; i++)
+        {
+            var insertedEntity = await repo.AddAsync(_testData[i]);
+
+            var fetchedEntity = await collection
+                .Find(e => e.Id == insertedEntity.Id)
+                .FirstOrDefaultAsync();
+            
+            Assert.Equal(insertedEntity.Id, fetchedEntity.Id);
+        }
         
+        var count = await collection.CountDocumentsAsync(new BsonDocument());
+        Assert.Equal(insertedEntityCount, count);
     }
 
     private WifiRepository GetRepository(TestDbContext context)
