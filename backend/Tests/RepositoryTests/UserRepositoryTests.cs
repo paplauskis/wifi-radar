@@ -26,59 +26,74 @@ public class UserRepositoryTests : BaseRepositoryTests<User, UserRepository>
     [InlineData(9)]
     public override async Task AddAsync_ShouldInsertEntityIntoCollection(int num)
     {
-        _context = new TestDbContext(CollectionName);
-        _repo = GetRepository(_context);
-        _collection = _context.Database.GetCollection<User>(CollectionName);
+        try
+        {
+            _context = new TestDbContext(CollectionName);
+            _repo = GetRepository(_context);
+            _collection = _context.Database.GetCollection<User>(CollectionName);
 
-        var insertedEntity = await _repo.AddAsync(_testData[num]);
+            var insertedEntity = await _repo.AddAsync(_testData[num]);
 
-        var fetchedEntity = await _collection
-            .Find(e => e.Id == insertedEntity.Id)
-            .FirstOrDefaultAsync();
+            var fetchedEntity = await _collection
+                .Find(e => e.Id == insertedEntity.Id)
+                .FirstOrDefaultAsync();
         
-        Assert.Equal(insertedEntity.Id, fetchedEntity.Id);
-        Assert.Equal(insertedEntity.Username, fetchedEntity.Username);
-        Assert.Equal(insertedEntity.Password, fetchedEntity.Password);
-        
-        _context.Dispose();
+            Assert.Equal(insertedEntity.Id, fetchedEntity.Id);
+            Assert.Equal(insertedEntity.Username, fetchedEntity.Username);
+            Assert.Equal(insertedEntity.Password, fetchedEntity.Password);
+        }
+        finally
+        {
+            _context?.Dispose();
+        }
     }
 
     [Theory]
     [MemberData(nameof(ValidObjects))]
     public override async Task GetByIdAsync_ShouldReturnCorrectEntity_WhenIdExists(User entity)
     {
-        _context = new TestDbContext(CollectionName);
-        _repo = GetRepository(_context);
-        _collection = _context.Database.GetCollection<User>(CollectionName);
+        try
+        {
+            _context = new TestDbContext(CollectionName);
+            _repo = GetRepository(_context);
+            _collection = _context.Database.GetCollection<User>(CollectionName);
 
-        var insertedEntity = await _repo.AddAsync(entity);
-        var fetchedEntity = await _repo.GetByIdAsync(entity.Id);
+            var insertedEntity = await _repo.AddAsync(entity);
+            var fetchedEntity = await _repo.GetByIdAsync(entity.Id);
 
-        Assert.NotNull(fetchedEntity);
-        Assert.Equal(insertedEntity.Id, fetchedEntity.Id);
-        Assert.Equal(insertedEntity.Username, fetchedEntity.Username);
-        Assert.Equal(insertedEntity.Password, fetchedEntity.Password);
-        
-        _context.Dispose();
+            Assert.NotNull(fetchedEntity);
+            Assert.Equal(insertedEntity.Id, fetchedEntity.Id);
+            Assert.Equal(insertedEntity.Username, fetchedEntity.Username);
+            Assert.Equal(insertedEntity.Password, fetchedEntity.Password);
+        }
+        finally
+        {
+            _context?.Dispose();
+        }
     }
 
     [Theory]
     [MemberData(nameof(ValidObjects))]
     public async Task GetByUsernameAsync_ShouldReturnCorrectEntity_WhenUsernameExists(User entity)
     {
-        _context = new TestDbContext(CollectionName);
-        _repo = GetRepository(_context);
-        _collection = _context.Database.GetCollection<User>(CollectionName);
+        try
+        {
+            _context = new TestDbContext(CollectionName);
+            _repo = GetRepository(_context);
+            _collection = _context.Database.GetCollection<User>(CollectionName);
         
-        var insertedEntity = await _repo.AddAsync(entity);
-        var fetchedEntity = await _repo.GetByUsernameAsync(entity.Username);
+            var insertedEntity = await _repo.AddAsync(entity);
+            var fetchedEntity = await _repo.GetByUsernameAsync(entity.Username);
 
-        Assert.NotNull(fetchedEntity);
-        Assert.Equal(insertedEntity.Id, fetchedEntity.Id);
-        Assert.Equal(insertedEntity.Username, fetchedEntity.Username);
-        Assert.Equal(insertedEntity.Password, fetchedEntity.Password);
-        
-        _context.Dispose();
+            Assert.NotNull(fetchedEntity);
+            Assert.Equal(insertedEntity.Id, fetchedEntity.Id);
+            Assert.Equal(insertedEntity.Username, fetchedEntity.Username);
+            Assert.Equal(insertedEntity.Password, fetchedEntity.Password);
+        }
+        finally
+        {
+            _context?.Dispose();
+        }
     }
 
     protected override UserRepository GetRepository(TestDbContext context)
