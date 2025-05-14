@@ -32,66 +32,81 @@ public abstract class BaseRepositoryTests<TEntity, TRepository>
     [Fact]
     public async Task AddAsync_ShouldGenerateNewId_WhenIdIsNull()
     {
-        _context = new TestDbContext(_collectionName);
-        _repo = GetRepository(_context);
-        _collection = _context.Database.GetCollection<TEntity>(_collectionName);
+        try
+        {
+            _context = new TestDbContext(_collectionName);
+            _repo = GetRepository(_context);
+            _collection = _context.Database.GetCollection<TEntity>(_collectionName);
 
-        var entityToBeInserted = _testData.First();
-        entityToBeInserted.Id = null!;
-        await _repo.AddAsync(entityToBeInserted);
+            var entityToBeInserted = _testData.First();
+            entityToBeInserted.Id = null!;
+            await _repo.AddAsync(entityToBeInserted);
 
-        var fetchedEntityList = await _collection.Find(_ => true).ToListAsync();
+            var fetchedEntityList = await _collection.Find(_ => true).ToListAsync();
         
-        Assert.Single(fetchedEntityList);
-        Assert.NotNull(fetchedEntityList[0].Id);
-        
-        _context.Dispose();
+            Assert.Single(fetchedEntityList);
+            Assert.NotNull(fetchedEntityList[0].Id);
+        }
+        finally
+        {
+            _context?.Dispose();
+        }
     }
 
     [Fact]
     public async Task AddAsync_ShouldNotOverwriteId_WhenIdIsAlreadySet()
     {
-        _context = new TestDbContext(_collectionName);
-        _repo = GetRepository(_context);
-        _collection = _context.Database.GetCollection<TEntity>(_collectionName);
+        try
+        {
+            _context = new TestDbContext(_collectionName);
+            _repo = GetRepository(_context);
+            _collection = _context.Database.GetCollection<TEntity>(_collectionName);
 
-        var customId = ObjectId.GenerateNewId().ToString();
+            var customId = ObjectId.GenerateNewId().ToString();
 
-        var entityToBeInserted = _testData.First();
-        entityToBeInserted.Id = customId;
-        await _repo.AddAsync(entityToBeInserted);
-        var fetchedEntity = await _collection.Find(e => e.Id == customId).FirstAsync();
+            var entityToBeInserted = _testData.First();
+            entityToBeInserted.Id = customId;
+            await _repo.AddAsync(entityToBeInserted);
+            var fetchedEntity = await _collection.Find(e => e.Id == customId).FirstAsync();
 
-        Assert.NotNull(fetchedEntity);
-        Assert.Equal(customId, entityToBeInserted.Id);
-        Assert.Equal(customId, fetchedEntity.Id);
-        
-        _context.Dispose();
+            Assert.NotNull(fetchedEntity);
+            Assert.Equal(customId, entityToBeInserted.Id); 
+            Assert.Equal(customId, fetchedEntity.Id);
+        }
+        finally
+        {
+            _context?.Dispose();
+        }
     }
 
     [Fact]
     public async Task AddAsync_ShouldThrowException_WhenEntityIsNull()
     {
-        _context = new TestDbContext(_collectionName);
-        _repo = GetRepository(_context);
-        _collection = _context.Database.GetCollection<TEntity>(_collectionName);
-
-        TEntity entityToBeInserted = null!;
-        bool exceptionThrown = false;
-
         try
         {
-            await _repo.AddAsync(entityToBeInserted);
-            await _collection.Find(_ => true).FirstAsync();
+            _context = new TestDbContext(_collectionName);
+            _repo = GetRepository(_context);
+            _collection = _context.Database.GetCollection<TEntity>(_collectionName);
+
+            TEntity entityToBeInserted = null!;
+            bool exceptionThrown = false;
+
+            try
+            {
+                await _repo.AddAsync(entityToBeInserted);
+                await _collection.Find(_ => true).FirstAsync();
+            }
+            catch (Exception)
+            {
+                exceptionThrown = true;
+            }
+        
+            Assert.True(exceptionThrown);
         }
-        catch (Exception)
+        finally
         {
-            exceptionThrown = true;
+            _context?.Dispose();
         }
-        
-        Assert.True(exceptionThrown);
-        
-        _context.Dispose();
     }
     
     public abstract Task GetByIdAsync_ShouldReturnCorrectEntity_WhenIdExists(TEntity entity);
@@ -99,21 +114,26 @@ public abstract class BaseRepositoryTests<TEntity, TRepository>
     [Fact]
     public async Task GetByIdAsync_ShouldReturnNull_WhenIdDoesNotExist()
     {
-        _context = new TestDbContext(_collectionName);
-        _repo = GetRepository(_context);
-        _collection = _context.Database.GetCollection<TEntity>(_collectionName);
-
-        var randomId = ObjectId.GenerateNewId().ToString();
-
-        foreach (var entity in _testData)
+        try
         {
-            await _repo.AddAsync(entity);
+            _context = new TestDbContext(_collectionName);
+            _repo = GetRepository(_context);
+            _collection = _context.Database.GetCollection<TEntity>(_collectionName);
+
+            var randomId = ObjectId.GenerateNewId().ToString();
+
+            foreach (var entity in _testData)
+            {
+                await _repo.AddAsync(entity);
+            }
+        
+            var fetchedEntity = await _repo.GetByIdAsync(randomId);
+            Assert.Null(fetchedEntity);
         }
-        
-        var fetchedEntity = await _repo.GetByIdAsync(randomId);
-        Assert.Null(fetchedEntity);
-        
-        _context.Dispose();
+        finally
+        {
+            _context?.Dispose();
+        }
     }
 
     protected abstract TRepository GetRepository(TestDbContext context);
