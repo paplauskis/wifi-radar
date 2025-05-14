@@ -31,17 +31,13 @@ public class WifiReviewRepositoryTests: BaseRepositoryTests<WifiReview, WifiRevi
             _repo = GetRepository(_context);
             _collection = _context.Database.GetCollection<WifiReview>(CollectionName);
 
-            var insertedEntity = await _repo.AddAsync(_testData[num]);
+            var expected = await _repo.AddAsync(_testData[num]);
 
-            var fetchedEntity = await _collection
-                .Find(e => e.Id == insertedEntity.Id)
+            var actual = await _collection
+                .Find(e => e.Id == expected.Id)
                 .FirstOrDefaultAsync();
 
-            Assert.Equal(insertedEntity.Id, fetchedEntity.Id);
-            Assert.Equal(insertedEntity.UserId, fetchedEntity.UserId);
-            Assert.Equal(insertedEntity.WifiId, fetchedEntity.WifiId);
-            Assert.Equal(insertedEntity.Text, fetchedEntity.Text);
-            Assert.Equal(insertedEntity.Rating, fetchedEntity.Rating);
+            AssertWifiReviewValuesEqual(expected, actual);
         }
         finally
         {
@@ -59,15 +55,11 @@ public class WifiReviewRepositoryTests: BaseRepositoryTests<WifiReview, WifiRevi
             _repo = GetRepository(_context);
             _collection = _context.Database.GetCollection<WifiReview>(CollectionName);
 
-            var insertedEntity = await _repo.AddAsync(entity);
-            var fetchedEntity = await _repo.GetByIdAsync(entity.Id);
+            var expected = await _repo.AddAsync(entity);
+            var actual = await _repo.GetByIdAsync(entity.Id);
 
-            Assert.NotNull(fetchedEntity);
-            Assert.Equal(insertedEntity.Id, fetchedEntity.Id);
-            Assert.Equal(insertedEntity.UserId, fetchedEntity.UserId);
-            Assert.Equal(insertedEntity.WifiId, fetchedEntity.WifiId);
-            Assert.Equal(insertedEntity.Text, fetchedEntity.Text);
-            Assert.Equal(insertedEntity.Rating, fetchedEntity.Rating);   
+            Assert.NotNull(actual);
+            AssertWifiReviewValuesEqual(expected, actual);
         }
         finally
         {
@@ -82,5 +74,14 @@ public class WifiReviewRepositoryTests: BaseRepositoryTests<WifiReview, WifiRevi
         services.AddScoped<WifiReviewRepository>();
         var serviceProvider = services.BuildServiceProvider();
         return serviceProvider.GetRequiredService<WifiReviewRepository>();
+    }
+
+    private static void AssertWifiReviewValuesEqual(WifiReview expected, WifiReview actual)
+    {
+        Assert.Equal(expected.Id, actual.Id);
+        Assert.Equal(expected.UserId, actual.UserId);
+        Assert.Equal(expected.WifiId, actual.WifiId);
+        Assert.Equal(expected.Text, actual.Text);
+        Assert.Equal(expected.Rating, actual.Rating);   
     }
 }
