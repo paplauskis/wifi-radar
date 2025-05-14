@@ -28,5 +28,35 @@
     "DateCreated": "2025-05-14T10:00:00Z",
     "Username": "eve_adams",
     "Password": "ev3adm1n"
+  },
+  {
+    "Id": "64c8aaf793c3e1a1f6f884a6",
+    "DateCreated": "2025-05-14T10:00:00Z",
+    "Username": "linda_park",
+    "Password": "lindaSecure77"
+  },
+  {
+    "Id": "64c8aaf793c3e1a1f6f884a7",
+    "DateCreated": "2025-05-14T10:00:00Z",
+    "Username": "michael.tan",
+    "Password": "m1chaelPass!"
+  },
+  {
+    "Id": "64c8aaf793c3e1a1f6f884a8",
+    "DateCreated": "2025-05-14T10:00:00Z",
+    "Username": "sofia_gomez",
+    "Password": "sofia2025$"
+  },
+  {
+    "Id": "64c8aaf793c3e1a1f6f884a9",
+    "DateCreated": "2025-05-14T10:00:00Z",
+    "Username": "daniel_lee",
+    "Password": "D4nielPwd321"
+  },
+  {
+    "Id": "64c8aaf793c3e1a1f6f884aa",
+    "DateCreated": "2025-05-14T10:00:00Z",
+    "Username": "natalie.kim",
+    "Password": "natK!m987"
   }
 ]
