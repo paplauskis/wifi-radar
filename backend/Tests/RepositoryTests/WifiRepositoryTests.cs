@@ -85,6 +85,54 @@ public class WifiRepositoryTests : BaseRepositoryTests<WifiNetwork, WifiReposito
         }
     }
 
+    [Theory]
+    [InlineData("Vilnius", 5)]
+    [InlineData("Kaunas", 3)]
+    [InlineData("Klaipėda", 2)]
+    [InlineData("Alytus", 0)]
+    public async Task GetByCityAsync_ShouldReturnCorrectEntities_WhenCityMatches(string city, int expectedCount)
+    {
+        try
+        {
+            _context = new TestDbContext(CollectionName);
+            _repo = GetRepository(_context);
+            _collection = _context.Database.GetCollection<WifiNetwork>(CollectionName);
+
+            List<WifiNetwork> correctEntityList = [];
+
+            foreach (var entity in _testData)
+            {
+                if(entity.City == city) correctEntityList.Add(entity);
+                await _repo.AddAsync(entity);
+            }
+
+            var entityList = await _repo.GetByCityAsync(city);
+            
+            var orderedEntityList = entityList.OrderBy(e => e.Id).ToList();
+            var orderedCorrectEntityList = correctEntityList.OrderBy(e => e.Id).ToList();
+
+            Assert.Equal(entityList.Count, expectedCount);
+
+            for (int i = 0; i < expectedCount; i++)
+            {
+                Assert.Equal(orderedCorrectEntityList[i].Id, orderedEntityList[i].Id);
+                Assert.Equal(orderedCorrectEntityList[i].UserId, orderedEntityList[i].UserId);
+                Assert.Equal(orderedCorrectEntityList[i].Country, orderedEntityList[i].Country);
+                Assert.Equal(orderedCorrectEntityList[i].City, orderedEntityList[i].City);
+                Assert.Equal(orderedCorrectEntityList[i].PlaceName, orderedEntityList[i].PlaceName);
+                Assert.Equal(orderedCorrectEntityList[i].Street, orderedEntityList[i].Street);
+                Assert.Equal(orderedCorrectEntityList[i].BuildingNumber, orderedEntityList[i].BuildingNumber);
+                Assert.Equal(orderedCorrectEntityList[i].PostalCode, orderedEntityList[i].PostalCode);
+                Assert.Equal(orderedCorrectEntityList[i].IsFree, orderedEntityList[i].IsFree);
+                Assert.Equal(orderedCorrectEntityList[i].Password, orderedEntityList[i].Password);
+            }
+        }
+        finally
+        {
+            _context?.Dispose();
+        }
+    }
+
     protected override WifiRepository GetRepository(TestDbContext context)
     {
         var services = new ServiceCollection();
