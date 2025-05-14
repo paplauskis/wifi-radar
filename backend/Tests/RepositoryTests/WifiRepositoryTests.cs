@@ -12,51 +12,53 @@ public class WifiRepositoryTests
 {
     private const string CollectionName = "Favorite-WiFi-Spots";
     private readonly List<WifiNetwork> _testData = JsonHelper.GetPocoObjects<WifiNetwork>();
-    
-    public WifiRepositoryTests()
-    {
-    }
+    private TestDbContext? _context;
+    private WifiRepository? _repo;
+    private IMongoCollection<WifiNetwork>? _collection;
     
     [Fact]
     public async Task AddAsync_ShouldInsertEntityIntoCollection()
     {
-        using var context = new TestDbContext(CollectionName);
-        var repo = GetRepository(context);
-        var collection = context.Database.GetCollection<WifiNetwork>(CollectionName);
+        _context = new TestDbContext(CollectionName);
+        _repo = GetRepository(_context);
+        _collection = _context.Database.GetCollection<WifiNetwork>(CollectionName);
 
         var insertedEntityCount = _testData.Count / 2;
 
         for (int i = 1; i <= insertedEntityCount; i++)
         {
-            var insertedEntity = await repo.AddAsync(_testData[i]);
+            var insertedEntity = await _repo.AddAsync(_testData[i]);
 
-            var fetchedEntity = await collection
+            var fetchedEntity = await _collection
                 .Find(e => e.Id == insertedEntity.Id)
                 .FirstOrDefaultAsync();
             
             Assert.Equal(insertedEntity.Id, fetchedEntity.Id);
         }
         
-        var count = await collection.CountDocumentsAsync(new BsonDocument());
+        var count = await _collection.CountDocumentsAsync(new BsonDocument());
         Assert.Equal(insertedEntityCount, count);
+        
+        _context.Dispose();
     }
 
     [Fact]
     public async Task AddAsync_ShouldGenerateNewId_WhenIdIsNull()
     {
-        using var context = new TestDbContext(CollectionName);
-        var repo = GetRepository(context);
-        var collection = context.Database.GetCollection<WifiNetwork>(CollectionName);
+        _context = new TestDbContext(CollectionName);
+        _repo = GetRepository(_context);
+        _collection = _context.Database.GetCollection<WifiNetwork>(CollectionName);
 
         var entityToBeInserted = _testData.First();
         entityToBeInserted.Id = null!;
-        await repo.AddAsync(entityToBeInserted);
+        await _repo.AddAsync(entityToBeInserted);
 
-        var fetchedEntityList = await collection.Find(_ => true).ToListAsync();
-        var count = await collection.CountDocumentsAsync(new BsonDocument());
+        var fetchedEntityList = await _collection.Find(_ => true).ToListAsync();
         
         Assert.Single(fetchedEntityList);
         Assert.NotNull(fetchedEntityList[0].Id);
+        
+        _context.Dispose();
     }
 
     private WifiRepository GetRepository(TestDbContext context)
