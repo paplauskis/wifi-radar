@@ -1,9 +1,7 @@
 using API.Data.Repositories;
 using API.Domain.Models;
 using Microsoft.Extensions.DependencyInjection;
-using MongoDB.Bson;
 using MongoDB.Driver;
-using Tests.Helpers;
 using Xunit;
 
 namespace Tests.RepositoryTests;
