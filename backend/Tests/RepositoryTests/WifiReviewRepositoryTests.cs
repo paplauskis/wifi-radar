@@ -44,9 +44,25 @@ public class WifiReviewRepositoryTests: BaseRepositoryTests<WifiReview, WifiRevi
         _context.Dispose();
     }
 
-    public override Task GetByIdAsync_ShouldReturnCorrectEntity_WhenIdExists(WifiReview entity)
+    [Theory]
+    [MemberData(nameof(ValidObjects))]
+    public override async Task GetByIdAsync_ShouldReturnCorrectEntity_WhenIdExists(WifiReview entity)
     {
-        throw new NotImplementedException();
+        _context = new TestDbContext(CollectionName);
+        _repo = GetRepository(_context);
+        _collection = _context.Database.GetCollection<WifiReview>(CollectionName);
+
+        var insertedEntity = await _repo.AddAsync(entity);
+        var fetchedEntity = await _repo.GetByIdAsync(entity.Id);
+
+        Assert.NotNull(fetchedEntity);
+        Assert.Equal(insertedEntity.Id, fetchedEntity.Id);
+        Assert.Equal(insertedEntity.UserId, fetchedEntity.UserId);
+        Assert.Equal(insertedEntity.WifiId, fetchedEntity.WifiId);
+        Assert.Equal(insertedEntity.Text, fetchedEntity.Text);
+        Assert.Equal(insertedEntity.Rating, fetchedEntity.Rating);
+        
+        _context.Dispose();
     }
 
     protected override WifiReviewRepository GetRepository(TestDbContext context)
