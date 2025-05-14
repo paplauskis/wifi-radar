@@ -1,7 +1,6 @@
 using API.Data.Repositories;
 using API.Domain.Models;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.VisualStudio.TestPlatform.ObjectModel.Adapter;
 using MongoDB.Bson;
 using MongoDB.Driver;
 using Tests.Helpers;
@@ -9,18 +8,11 @@ using Xunit;
 
 namespace Tests.RepositoryTests;
 
-public class WifiRepositoryTests
+public class WifiRepositoryTests : BaseRepositoryTests<WifiNetwork, WifiRepository>
 {
     private const string CollectionName = "Favorite-WiFi-Spots";
-    private readonly List<WifiNetwork> _testData = JsonHelper.GetPocoObjects<WifiNetwork>();
-    private TestDbContext? _context;
-    private WifiRepository? _repo;
-    private IMongoCollection<WifiNetwork>? _collection;
-    
-    public static IEnumerable<object[]> ValidObjects =>
-        JsonHelper.GetPocoObjects<WifiNetwork>()
-            .Take(10)
-            .Select(w => new object[] { w });
+
+    public WifiRepositoryTests() : base(CollectionName) {}
     
     [Theory]
     [InlineData(0)]
@@ -33,7 +25,7 @@ public class WifiRepositoryTests
     [InlineData(7)]
     [InlineData(8)]
     [InlineData(9)]
-    public async Task AddAsync_ShouldInsertEntityIntoCollection(int num)
+    public override async Task AddAsync_ShouldInsertEntityIntoCollection(int num)
     {
         _context = new TestDbContext(CollectionName);
         _repo = GetRepository(_context);
@@ -59,74 +51,9 @@ public class WifiRepositoryTests
         _context.Dispose();
     }
 
-    [Fact]
-    public async Task AddAsync_ShouldGenerateNewId_WhenIdIsNull()
-    {
-        _context = new TestDbContext(CollectionName);
-        _repo = GetRepository(_context);
-        _collection = _context.Database.GetCollection<WifiNetwork>(CollectionName);
-
-        var entityToBeInserted = _testData.First();
-        entityToBeInserted.Id = null!;
-        await _repo.AddAsync(entityToBeInserted);
-
-        var fetchedEntityList = await _collection.Find(_ => true).ToListAsync();
-        
-        Assert.Single(fetchedEntityList);
-        Assert.NotNull(fetchedEntityList[0].Id);
-        
-        _context.Dispose();
-    }
-
-    [Fact]
-    public async Task AddAsync_ShouldNotOverwriteId_WhenIdIsAlreadySet()
-    {
-        _context = new TestDbContext(CollectionName);
-        _repo = GetRepository(_context);
-        _collection = _context.Database.GetCollection<WifiNetwork>(CollectionName);
-
-        var customId = ObjectId.GenerateNewId().ToString();
-
-        var entityToBeInserted = _testData.First();
-        entityToBeInserted.Id = customId;
-        await _repo.AddAsync(entityToBeInserted);
-        var fetchedEntity = await _collection.Find(e => e.Id == customId).FirstAsync();
-
-        Assert.NotNull(fetchedEntity);
-        Assert.Equal(customId, entityToBeInserted.Id);
-        Assert.Equal(customId, fetchedEntity.Id);
-        
-        _context.Dispose();
-    }
-
-    [Fact]
-    public async Task AddAsync_ShouldThrowException_WhenEntityIsNull()
-    {
-        _context = new TestDbContext(CollectionName);
-        _repo = GetRepository(_context);
-        _collection = _context.Database.GetCollection<WifiNetwork>(CollectionName);
-
-        WifiNetwork entityToBeInserted = null!;
-        bool exceptionThrown = false;
-
-        try
-        {
-            await _repo.AddAsync(entityToBeInserted);
-            await _collection.Find(_ => true).FirstAsync();
-        }
-        catch (Exception)
-        {
-            exceptionThrown = true;
-        }
-        
-        Assert.True(exceptionThrown);
-        
-        _context.Dispose();
-    }
-
     [Theory]
     [MemberData(nameof(ValidObjects))]
-    public async Task GetByIdAsync_ShouldReturnCorrectEntity_WhenIdExists(WifiNetwork entity)
+    public override async Task GetByIdAsync_ShouldReturnCorrectEntity_WhenIdExists(WifiNetwork entity)
     {
         _context = new TestDbContext(CollectionName);
         _repo = GetRepository(_context);
@@ -150,27 +77,7 @@ public class WifiRepositoryTests
         _context.Dispose();
     }
 
-    [Fact]
-    public async Task GetByIdAsync_ShouldReturnNull_WhenIdDoesNotExist()
-    {
-        _context = new TestDbContext(CollectionName);
-        _repo = GetRepository(_context);
-        _collection = _context.Database.GetCollection<WifiNetwork>(CollectionName);
-
-        var randomId = ObjectId.GenerateNewId().ToString();
-
-        foreach (var entity in _testData)
-        {
-            await _repo.AddAsync(entity);
-        }
-        
-        var fetchedEntity = await _repo.GetByIdAsync(randomId);
-        Assert.Null(fetchedEntity);
-        
-        _context.Dispose();
-    }
-
-    private WifiRepository GetRepository(TestDbContext context)
+    protected override WifiRepository GetRepository(TestDbContext context)
     {
         var services = new ServiceCollection();
         services.AddSingleton(context.Database);
