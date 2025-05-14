@@ -61,6 +61,27 @@ public class WifiRepositoryTests
         _context.Dispose();
     }
 
+    [Fact]
+    public async Task AddAsync_ShouldNotOverwriteId_WhenIdIsAlreadySet()
+    {
+        _context = new TestDbContext(CollectionName);
+        _repo = GetRepository(_context);
+        _collection = _context.Database.GetCollection<WifiNetwork>(CollectionName);
+
+        var customId = ObjectId.GenerateNewId().ToString();
+
+        var entityToBeInserted = _testData.First();
+        entityToBeInserted.Id = customId;
+        await _repo.AddAsync(entityToBeInserted);
+        var fetchedEntity = await _collection.Find(e => e.Id == customId).FirstAsync();
+
+        Assert.NotNull(fetchedEntity);
+        Assert.Equal(customId, entityToBeInserted.Id);
+        Assert.Equal(customId, fetchedEntity.Id);
+        
+        _context.Dispose();
+    }
+
     private WifiRepository GetRepository(TestDbContext context)
     {
         var services = new ServiceCollection();
