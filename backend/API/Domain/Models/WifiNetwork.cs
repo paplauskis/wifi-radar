@@ -5,7 +5,7 @@ namespace API.Domain.Models;
 public class WifiNetwork : TimeStampedEntity
 {
     [BsonElement("UserID")]
-    public int UserId { get; set; }
+    public string UserId { get; set; }
 
     [BsonElement("Country")]
     public string Country { get; set; }
