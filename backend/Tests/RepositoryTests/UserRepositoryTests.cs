@@ -32,15 +32,13 @@ public class UserRepositoryTests : BaseRepositoryTests<User, UserRepository>
             _repo = GetRepository(_context);
             _collection = _context.Database.GetCollection<User>(CollectionName);
 
-            var insertedEntity = await _repo.AddAsync(_testData[num]);
+            var expected = await _repo.AddAsync(_testData[num]);
 
-            var fetchedEntity = await _collection
-                .Find(e => e.Id == insertedEntity.Id)
+            var actual = await _collection
+                .Find(e => e.Id == expected.Id)
                 .FirstOrDefaultAsync();
         
-            Assert.Equal(insertedEntity.Id, fetchedEntity.Id);
-            Assert.Equal(insertedEntity.Username, fetchedEntity.Username);
-            Assert.Equal(insertedEntity.Password, fetchedEntity.Password);
+            AssertUserValuesEqual(expected, actual);
         }
         finally
         {
@@ -58,13 +56,11 @@ public class UserRepositoryTests : BaseRepositoryTests<User, UserRepository>
             _repo = GetRepository(_context);
             _collection = _context.Database.GetCollection<User>(CollectionName);
 
-            var insertedEntity = await _repo.AddAsync(entity);
-            var fetchedEntity = await _repo.GetByIdAsync(entity.Id);
+            var expected = await _repo.AddAsync(entity);
+            var actual = await _repo.GetByIdAsync(entity.Id);
 
-            Assert.NotNull(fetchedEntity);
-            Assert.Equal(insertedEntity.Id, fetchedEntity.Id);
-            Assert.Equal(insertedEntity.Username, fetchedEntity.Username);
-            Assert.Equal(insertedEntity.Password, fetchedEntity.Password);
+            Assert.NotNull(actual);
+            AssertUserValuesEqual(expected, actual);
         }
         finally
         {
@@ -82,13 +78,11 @@ public class UserRepositoryTests : BaseRepositoryTests<User, UserRepository>
             _repo = GetRepository(_context);
             _collection = _context.Database.GetCollection<User>(CollectionName);
         
-            var insertedEntity = await _repo.AddAsync(entity);
-            var fetchedEntity = await _repo.GetByUsernameAsync(entity.Username);
+            var expected = await _repo.AddAsync(entity);
+            var actual = await _repo.GetByUsernameAsync(entity.Username);
 
-            Assert.NotNull(fetchedEntity);
-            Assert.Equal(insertedEntity.Id, fetchedEntity.Id);
-            Assert.Equal(insertedEntity.Username, fetchedEntity.Username);
-            Assert.Equal(insertedEntity.Password, fetchedEntity.Password);
+            Assert.NotNull(actual);
+            AssertUserValuesEqual(expected, actual);
         }
         finally
         {
@@ -145,5 +139,12 @@ public class UserRepositoryTests : BaseRepositoryTests<User, UserRepository>
         services.AddScoped<UserRepository>();
         var serviceProvider = services.BuildServiceProvider();
         return serviceProvider.GetRequiredService<UserRepository>();
+    }
+
+    private static void AssertUserValuesEqual(User expected, User actual)
+    {
+        Assert.Equal(expected.Id, actual.Id);
+        Assert.Equal(expected.Username, actual.Username);
+        Assert.Equal(expected.Password, actual.Password);
     }
 }
