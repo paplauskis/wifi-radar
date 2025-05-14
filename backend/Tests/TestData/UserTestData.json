@@ -1,21 +1,31 @@
 [
   {
+    "Id": "64c8aaf793c3e1a1f6f884a1",
+    "DateCreated": "2025-05-14T10:00:00Z",
     "Username": "john_doe",
     "Password": "password123"
   },
   {
+    "Id": "64c8aaf793c3e1a1f6f884a2",
+    "DateCreated": "2025-05-14T10:00:00Z",
     "Username": "alice_smith",
     "Password": "alicePass456"
   },
   {
+    "Id": "64c8aaf793c3e1a1f6f884a3",
+    "DateCreated": "2025-05-14T10:00:00Z",
     "Username": "bob.jenkins",
     "Password": "securePa$$word"
   },
   {
+    "Id": "64c8aaf793c3e1a1f6f884a4",
+    "DateCreated": "2025-05-14T10:00:00Z",
     "Username": "charlie89",
     "Password": "charlie!2024"
   },
   {
+    "Id": "64c8aaf793c3e1a1f6f884a5",
+    "DateCreated": "2025-05-14T10:00:00Z",
     "Username": "eve_adams",
     "Password": "ev3adm1n"
   }
