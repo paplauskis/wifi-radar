@@ -96,6 +96,26 @@ public class UserRepositoryTests : BaseRepositoryTests<User, UserRepository>
         }
     }
 
+    [Fact]
+    public async Task GetByUsernameAsync_ShouldReturnNull_WhenUsernameDoesNotExist()
+    {
+        try
+        {
+            _context = new TestDbContext(CollectionName);
+            _repo = GetRepository(_context);
+            _collection = _context.Database.GetCollection<User>(CollectionName);
+
+            var randomUsername = Guid.NewGuid().ToString();
+            var fetchedEntity = await _repo.GetByUsernameAsync(randomUsername);
+
+            Assert.Null(fetchedEntity);
+        }
+        finally
+        {
+            _context?.Dispose();
+        }
+    }
+
     protected override UserRepository GetRepository(TestDbContext context)
     {
         var services = new ServiceCollection();
