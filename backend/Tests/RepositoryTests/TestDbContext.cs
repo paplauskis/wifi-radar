@@ -1,4 +1,4 @@
-using API.Domain.Models;
+using Tests.Helpers;
 using MongoDB.Driver;
 using Mongo2Go;
 using Newtonsoft.Json;
@@ -7,9 +7,9 @@ namespace Tests.RepositoryTests;
 
 public class TestDbContext : IDisposable
 {
-    internal MongoDbRunner _runner;
-    internal string DatabaseName = "JavaWebService";
-    private string _collection;
+    private readonly MongoDbRunner _runner;
+    private readonly string DatabaseName = "JavaWebService";
+    private readonly string _collection;
     
     internal IMongoDatabase Database { get; }
 
@@ -24,23 +24,10 @@ public class TestDbContext : IDisposable
     
     public void ImportTestData<T>()
     {
-        var filePath = GetFilePath($"{typeof(T).Name}TestData.json");
-        var jsonData = File.ReadAllText(filePath);
-        var objectList = JsonConvert.DeserializeObject<List<T>>(jsonData);
+        var objectList = JsonHelper.GetPocoObjects<T>();
         var collection = Database.GetCollection<T>(_collection);
         
         collection.InsertMany(objectList);
-    }
-    
-    private string GetFilePath(string file)
-    {
-        return Path.GetFullPath(Path.Combine(
-            AppContext.BaseDirectory,
-            "..",
-            "..",
-            "..",
-            "TestData",
-            file));
     }
 
     public void Dispose()
