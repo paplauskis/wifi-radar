@@ -1,5 +1,7 @@
 [
   {
+    "Id": "64c8aaf793c3e1a1f6f884f2",
+    "DateCreated": "2025-05-14T10:00:00Z",
     "UserID": "64c8aaf793c3e1a1f6f884f2",
     "Country": "Lithuania",
     "City": "Vilnius",
@@ -11,6 +13,8 @@
     "Password": null
   },
   {
+    "Id": "64c8aaf793c3e1a1f6f884f3",
+    "DateCreated": "2025-05-14T10:00:00Z",
     "UserID": "64c8aaf793c3e1a1f6f884f3",
     "Country": "Lithuania",
     "City": "Vilnius",
@@ -22,6 +26,8 @@
     "Password": null
   },
   {
+    "Id": "64c8aaf793c3e1a1f6f884f4",
+    "DateCreated": "2025-05-14T10:00:00Z",
     "UserID": "64c8aaf793c3e1a1f6f884f4",
     "Country": "Lithuania",
     "City": "Vilnius",
@@ -33,6 +39,8 @@
     "Password": "star123"
   },
   {
+    "Id": "64c8aaf793c3e1a1f6f884f5",
+    "DateCreated": "2025-05-14T10:00:00Z",
     "UserID": "64c8aaf793c3e1a1f6f884f5",
     "Country": "Lithuania",
     "City": "Vilnius",
@@ -44,6 +52,8 @@
     "Password": null
   },
   {
+    "Id": "64c8aaf793c3e1a1f6f884a4",
+    "DateCreated": "2025-05-14T10:00:00Z",
     "UserID": "64c8aaf793c3e1a1f6f884a4",
     "Country": "Lithuania",
     "City": "Vilnius",
