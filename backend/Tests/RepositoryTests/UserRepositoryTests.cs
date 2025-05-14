@@ -62,6 +62,25 @@ public class UserRepositoryTests : BaseRepositoryTests<User, UserRepository>
         _context.Dispose();
     }
 
+    [Theory]
+    [MemberData(nameof(ValidObjects))]
+    public async Task GetByUsernameAsync_ShouldReturnCorrectEntity_WhenUsernameExists(User entity)
+    {
+        _context = new TestDbContext(CollectionName);
+        _repo = GetRepository(_context);
+        _collection = _context.Database.GetCollection<User>(CollectionName);
+        
+        var insertedEntity = await _repo.AddAsync(entity);
+        var fetchedEntity = await _repo.GetByUsernameAsync(entity.Username);
+
+        Assert.NotNull(fetchedEntity);
+        Assert.Equal(insertedEntity.Id, fetchedEntity.Id);
+        Assert.Equal(insertedEntity.Username, fetchedEntity.Username);
+        Assert.Equal(insertedEntity.Password, fetchedEntity.Password);
+        
+        _context.Dispose();
+    }
+
     protected override UserRepository GetRepository(TestDbContext context)
     {
         var services = new ServiceCollection();
