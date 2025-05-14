@@ -82,6 +82,31 @@ public class WifiRepositoryTests
         _context.Dispose();
     }
 
+    [Fact]
+    public async Task AddAsync_ShouldThrowException_WhenEntityIsNull()
+    {
+        _context = new TestDbContext(CollectionName);
+        _repo = GetRepository(_context);
+        _collection = _context.Database.GetCollection<WifiNetwork>(CollectionName);
+
+        WifiNetwork entityToBeInserted = null!;
+        bool exceptionThrown = false;
+
+        try
+        {
+            await _repo.AddAsync(entityToBeInserted);
+            await _collection.Find(_ => true).FirstAsync();
+        }
+        catch (Exception)
+        {
+            exceptionThrown = true;
+        }
+        
+        Assert.True(exceptionThrown);
+        
+        _context.Dispose();
+    }
+
     private WifiRepository GetRepository(TestDbContext context)
     {
         var services = new ServiceCollection();
