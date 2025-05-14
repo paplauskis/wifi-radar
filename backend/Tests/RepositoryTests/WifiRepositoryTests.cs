@@ -1,6 +1,7 @@
 using API.Data.Repositories;
 using API.Domain.Models;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel.Adapter;
 using MongoDB.Bson;
 using MongoDB.Driver;
 using Tests.Helpers;
@@ -15,6 +16,11 @@ public class WifiRepositoryTests
     private TestDbContext? _context;
     private WifiRepository? _repo;
     private IMongoCollection<WifiNetwork>? _collection;
+    
+    public static IEnumerable<object[]> ValidObjects =>
+        JsonHelper.GetPocoObjects<WifiNetwork>()
+            .Take(10)
+            .Select(w => new object[] { w });
     
     [Theory]
     [InlineData(0)]
@@ -114,6 +120,32 @@ public class WifiRepositoryTests
         }
         
         Assert.True(exceptionThrown);
+        
+        _context.Dispose();
+    }
+
+    [Theory]
+    [MemberData(nameof(ValidObjects))]
+    public async Task GetByIdAsync_ShouldReturnCorrectEntity_WhenIdExists(WifiNetwork entity)
+    {
+        _context = new TestDbContext(CollectionName);
+        _repo = GetRepository(_context);
+        _collection = _context.Database.GetCollection<WifiNetwork>(CollectionName);
+
+        var insertedEntity = await _repo.AddAsync(entity);
+        var fetchedEntity = await _repo.GetByIdAsync(entity.Id);
+
+        Assert.NotNull(fetchedEntity);
+        Assert.Equal(insertedEntity.Id, fetchedEntity.Id);
+        Assert.Equal(insertedEntity.UserId, fetchedEntity.UserId);
+        Assert.Equal(insertedEntity.Country, fetchedEntity.Country);
+        Assert.Equal(insertedEntity.City, fetchedEntity.City);
+        Assert.Equal(insertedEntity.PlaceName, fetchedEntity.PlaceName);
+        Assert.Equal(insertedEntity.Street, fetchedEntity.Street);
+        Assert.Equal(insertedEntity.BuildingNumber, fetchedEntity.BuildingNumber);
+        Assert.Equal(insertedEntity.PostalCode, fetchedEntity.PostalCode);
+        Assert.Equal(insertedEntity.IsFree, fetchedEntity.IsFree);
+        Assert.Equal(insertedEntity.Password, fetchedEntity.Password);
         
         _context.Dispose();
     }
