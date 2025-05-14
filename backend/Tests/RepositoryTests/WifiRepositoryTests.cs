@@ -150,6 +150,26 @@ public class WifiRepositoryTests
         _context.Dispose();
     }
 
+    [Fact]
+    public async Task GetByIdAsync_ShouldReturnNull_WhenIdDoesNotExist()
+    {
+        _context = new TestDbContext(CollectionName);
+        _repo = GetRepository(_context);
+        _collection = _context.Database.GetCollection<WifiNetwork>(CollectionName);
+
+        var randomId = ObjectId.GenerateNewId().ToString();
+
+        foreach (var entity in _testData)
+        {
+            await _repo.AddAsync(entity);
+        }
+        
+        var fetchedEntity = await _repo.GetByIdAsync(randomId);
+        Assert.Null(fetchedEntity);
+        
+        _context.Dispose();
+    }
+
     private WifiRepository GetRepository(TestDbContext context)
     {
         var services = new ServiceCollection();
