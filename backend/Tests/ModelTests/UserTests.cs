@@ -17,4 +17,17 @@ public class UserTests
         
         Assert.Contains("Username cannot be null or empty", exception.Message);
     }
+    
+    
+    [Theory]
+    [InlineData("vfesjnibfsdvnjoaspqiweru0rqiuqropqrmxcmvbnm")]
+    [InlineData("aaaaaaaaaaaaaaaaaaaaa")]
+    public void Username_ShouldThrowArgumentException_WhenUsernameIsTooLong(string username)
+    {
+        var user = new User();
+        
+        var exception = Assert.Throws<ArgumentException>(() => user.Username = username);
+        
+        Assert.Contains("Username is too long, maximum length is 20", exception.Message);
+    }
 }
