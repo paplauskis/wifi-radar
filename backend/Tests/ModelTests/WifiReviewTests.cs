@@ -54,7 +54,7 @@ public class WifiReviewTests
         
         var exception = Assert.Throws<ArgumentException>(() => wifi.Rating = rating);
     
-        Assert.Contains("Rating cannot be negative, 0 or above 10", exception.Message);
+        Assert.Contains("Rating must be between 1 and 10", exception.Message);
     }
 
     private void AssertProperty(PropertyInfo property, object value)
