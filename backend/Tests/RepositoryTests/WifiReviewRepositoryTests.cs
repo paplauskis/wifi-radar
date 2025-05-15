@@ -2,7 +2,6 @@ using API.Data.Repositories;
 using API.Domain.Models;
 using Microsoft.Extensions.DependencyInjection;
 using MongoDB.Driver;
-using Tests.Helpers;
 using Xunit;
 
 namespace Tests.RepositoryTests;
@@ -10,7 +9,6 @@ namespace Tests.RepositoryTests;
 public class WifiReviewRepositoryTests: BaseRepositoryTests<WifiReview, WifiReviewRepository>
 {
     private const string CollectionName = "Reviews";
-    // private readonly List<WifiReview> _testData = JsonHelper.GetWifiReviewTestData();
     
     public WifiReviewRepositoryTests() : base(CollectionName) {}
 

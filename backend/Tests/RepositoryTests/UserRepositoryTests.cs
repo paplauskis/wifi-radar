@@ -2,7 +2,6 @@ using API.Data.Repositories;
 using API.Domain.Models;
 using Microsoft.Extensions.DependencyInjection;
 using MongoDB.Driver;
-using Tests.Helpers;
 using Xunit;
 
 namespace Tests.RepositoryTests;
@@ -10,7 +9,7 @@ namespace Tests.RepositoryTests;
 public class UserRepositoryTests : BaseRepositoryTests<User, UserRepository>
 {
     private const string CollectionName = "Users";
-    // private readonly List<User> _testData = JsonHelper.GetUserTestData();
+    
     public UserRepositoryTests() : base(CollectionName) {}
 
 
