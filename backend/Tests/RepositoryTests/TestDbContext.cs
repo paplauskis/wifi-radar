@@ -22,14 +22,6 @@ public class TestDbContext : IDisposable
         Database = client.GetDatabase(DatabaseName);
     }
     
-    public void ImportTestData<T>()
-    {
-        var objectList = JsonHelper.GetPocoObjects<T>();
-        var collection = Database.GetCollection<T>(_collection);
-        
-        collection.InsertMany(objectList);
-    }
-
     public void Dispose()
     {
         _runner.Dispose();
