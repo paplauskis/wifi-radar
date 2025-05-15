@@ -25,44 +25,117 @@ public class WifiReviewRepositoryTests: BaseRepositoryTests<WifiReview, WifiRevi
     [InlineData(9)]
     public override async Task AddAsync_ShouldInsertEntityIntoCollection(int num)
     {
-        _context = new TestDbContext(CollectionName);
-        _repo = GetRepository(_context);
-        _collection = _context.Database.GetCollection<WifiReview>(CollectionName);
+        try
+        {
+            Context = new TestDbContext(CollectionName);
+            Repo = GetRepository(Context);
+            Collection = Context.Database.GetCollection<WifiReview>(CollectionName);
 
-        var insertedEntity = await _repo.AddAsync(_testData[num]);
+            var expected = await Repo.AddAsync(TestData[num]);
 
-        var fetchedEntity = await _collection
-            .Find(e => e.Id == insertedEntity.Id)
-            .FirstOrDefaultAsync();
-        
-        Assert.Equal(insertedEntity.Id, fetchedEntity.Id);
-        Assert.Equal(insertedEntity.UserId, fetchedEntity.UserId);
-        Assert.Equal(insertedEntity.WifiId, fetchedEntity.WifiId);
-        Assert.Equal(insertedEntity.Text, fetchedEntity.Text);
-        Assert.Equal(insertedEntity.Rating, fetchedEntity.Rating);
-        
-        _context.Dispose();
+            var actual = await Collection
+                .Find(e => e.Id == expected.Id)
+                .FirstOrDefaultAsync();
+
+            AssertWifiReviewValuesEqual(expected, actual);
+        }
+        finally
+        {
+            Context?.Dispose(); 
+        }
     }
 
     [Theory]
     [MemberData(nameof(ValidObjects))]
     public override async Task GetByIdAsync_ShouldReturnCorrectEntity_WhenIdExists(WifiReview entity)
     {
-        _context = new TestDbContext(CollectionName);
-        _repo = GetRepository(_context);
-        _collection = _context.Database.GetCollection<WifiReview>(CollectionName);
+        try
+        {
+            Context = new TestDbContext(CollectionName);
+            Repo = GetRepository(Context);
+            Collection = Context.Database.GetCollection<WifiReview>(CollectionName);
+            await Collection.InsertManyAsync(TestData);
 
-        var insertedEntity = await _repo.AddAsync(entity);
-        var fetchedEntity = await _repo.GetByIdAsync(entity.Id);
+            var expected = entity;
+            var actual = await Repo.GetByIdAsync(entity.Id);
 
-        Assert.NotNull(fetchedEntity);
-        Assert.Equal(insertedEntity.Id, fetchedEntity.Id);
-        Assert.Equal(insertedEntity.UserId, fetchedEntity.UserId);
-        Assert.Equal(insertedEntity.WifiId, fetchedEntity.WifiId);
-        Assert.Equal(insertedEntity.Text, fetchedEntity.Text);
-        Assert.Equal(insertedEntity.Rating, fetchedEntity.Rating);
-        
-        _context.Dispose();
+            Assert.NotNull(actual);
+            AssertWifiReviewValuesEqual(expected, actual);
+        }
+        finally
+        {
+            Context?.Dispose(); 
+        }
+    }
+
+    [Theory]
+    [MemberData(nameof(ValidObjects))]
+    public async Task GetReviewsByWifiIdAsync_ShouldReturnCorrectReviews_WhenWifiIdExists(WifiReview review)
+    {
+        try
+        {
+            Context = new TestDbContext(CollectionName);
+            Repo = GetRepository(Context);
+            Collection = Context.Database.GetCollection<WifiReview>(CollectionName);
+            await Collection.InsertManyAsync(TestData);
+    
+            var expected = TestData
+                .Where(e => e.WifiId == review.WifiId)
+                .OrderBy(e => e.WifiId)
+                .ToList();
+            var fetched = await Repo.GetReviewsByWifiIdAsync(review.WifiId);
+            var actual = fetched
+                .OrderBy(e => e.WifiId)
+                .ToList();
+    
+    
+            Assert.NotNull(actual);
+            Assert.Equal(expected.Count, actual.Count);
+    
+            for (int i = 0; i < expected.Count; i++)
+            {
+                AssertWifiReviewValuesEqual(expected[i], actual[i]);
+            }
+        }
+        finally
+        {
+            Context?.Dispose(); 
+        }
+    }
+
+    [Theory]
+    [InlineData(null)]
+    [InlineData("")]
+    [InlineData("   ")]
+    [InlineData("RANDOM_ID")]
+    [InlineData(null, true)]
+    [InlineData("", true)]
+    [InlineData("   ", true)]
+    [InlineData("RANDOM_ID", true)]
+    public async Task GetReviewsByWifiIdAsync_ShouldReturnNoReviews_WhenWifiIdIsInvalid(string? wifiId, bool emptyCollection = false)
+    {
+        try
+        {
+            Context = new TestDbContext(CollectionName);
+            Repo = GetRepository(Context);
+            Collection = Context.Database.GetCollection<WifiReview>(CollectionName);
+
+            if (!emptyCollection)
+            {
+                await Collection.InsertManyAsync(TestData);
+            }
+            
+            var fetched = await Repo.GetReviewsByWifiIdAsync(wifiId);
+            var actual = fetched
+                .OrderBy(e => e.WifiId)
+                .ToList();
+
+            Assert.Empty(actual);
+        }
+        finally
+        {
+            Context?.Dispose(); 
+        }
     }
 
     protected override WifiReviewRepository GetRepository(TestDbContext context)
@@ -72,5 +145,14 @@ public class WifiReviewRepositoryTests: BaseRepositoryTests<WifiReview, WifiRevi
         services.AddScoped<WifiReviewRepository>();
         var serviceProvider = services.BuildServiceProvider();
         return serviceProvider.GetRequiredService<WifiReviewRepository>();
+    }
+
+    private static void AssertWifiReviewValuesEqual(WifiReview expected, WifiReview actual)
+    {
+        Assert.Equal(expected.Id, actual.Id);
+        Assert.Equal(expected.UserId, actual.UserId);
+        Assert.Equal(expected.WifiId, actual.WifiId);
+        Assert.Equal(expected.Text, actual.Text);
+        Assert.Equal(expected.Rating, actual.Rating);   
     }
 }

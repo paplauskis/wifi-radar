@@ -9,7 +9,7 @@ namespace Tests.RepositoryTests;
 public class WifiRepositoryTests : BaseRepositoryTests<WifiNetwork, WifiRepository>
 {
     private const string CollectionName = "Favorite-WiFi-Spots";
-
+    
     public WifiRepositoryTests() : base(CollectionName) {}
     
     [Theory]
@@ -25,54 +25,89 @@ public class WifiRepositoryTests : BaseRepositoryTests<WifiNetwork, WifiReposito
     [InlineData(9)]
     public override async Task AddAsync_ShouldInsertEntityIntoCollection(int num)
     {
-        _context = new TestDbContext(CollectionName);
-        _repo = GetRepository(_context);
-        _collection = _context.Database.GetCollection<WifiNetwork>(CollectionName);
+        try
+        {
+            Context = new TestDbContext(CollectionName);
+            Repo = GetRepository(Context);
+            Collection = Context.Database.GetCollection<WifiNetwork>(CollectionName);
 
-        var insertedEntity = await _repo.AddAsync(_testData[num]);
+            var expected = await Repo.AddAsync(TestData[num]);
 
-        var fetchedEntity = await _collection
-            .Find(e => e.Id == insertedEntity.Id)
-            .FirstOrDefaultAsync();
+            var actual = await Collection
+                .Find(e => e.Id == expected.Id)
+                .FirstOrDefaultAsync();
         
-        Assert.Equal(insertedEntity.Id, fetchedEntity.Id);
-        Assert.Equal(insertedEntity.UserId, fetchedEntity.UserId);
-        Assert.Equal(insertedEntity.Country, fetchedEntity.Country);
-        Assert.Equal(insertedEntity.City, fetchedEntity.City);
-        Assert.Equal(insertedEntity.PlaceName, fetchedEntity.PlaceName);
-        Assert.Equal(insertedEntity.Street, fetchedEntity.Street);
-        Assert.Equal(insertedEntity.BuildingNumber, fetchedEntity.BuildingNumber);
-        Assert.Equal(insertedEntity.PostalCode, fetchedEntity.PostalCode);
-        Assert.Equal(insertedEntity.IsFree, fetchedEntity.IsFree);
-        Assert.Equal(insertedEntity.Password, fetchedEntity.Password);
-        
-        _context.Dispose();
+            AssertWifiNetworkValuesEqual(expected, actual);
+        }
+        finally
+        {
+            Context?.Dispose();
+        }
     }
 
     [Theory]
     [MemberData(nameof(ValidObjects))]
     public override async Task GetByIdAsync_ShouldReturnCorrectEntity_WhenIdExists(WifiNetwork entity)
     {
-        _context = new TestDbContext(CollectionName);
-        _repo = GetRepository(_context);
-        _collection = _context.Database.GetCollection<WifiNetwork>(CollectionName);
+        try
+        {
+            Context = new TestDbContext(CollectionName);
+            Repo = GetRepository(Context);
+            Collection = Context.Database.GetCollection<WifiNetwork>(CollectionName);
+            await Collection.InsertManyAsync(TestData);
 
-        var insertedEntity = await _repo.AddAsync(entity);
-        var fetchedEntity = await _repo.GetByIdAsync(entity.Id);
+            var expected = entity;
+            var actual = await Repo.GetByIdAsync(entity.Id);
 
-        Assert.NotNull(fetchedEntity);
-        Assert.Equal(insertedEntity.Id, fetchedEntity.Id);
-        Assert.Equal(insertedEntity.UserId, fetchedEntity.UserId);
-        Assert.Equal(insertedEntity.Country, fetchedEntity.Country);
-        Assert.Equal(insertedEntity.City, fetchedEntity.City);
-        Assert.Equal(insertedEntity.PlaceName, fetchedEntity.PlaceName);
-        Assert.Equal(insertedEntity.Street, fetchedEntity.Street);
-        Assert.Equal(insertedEntity.BuildingNumber, fetchedEntity.BuildingNumber);
-        Assert.Equal(insertedEntity.PostalCode, fetchedEntity.PostalCode);
-        Assert.Equal(insertedEntity.IsFree, fetchedEntity.IsFree);
-        Assert.Equal(insertedEntity.Password, fetchedEntity.Password);
-        
-        _context.Dispose();
+            Assert.NotNull(actual);
+            AssertWifiNetworkValuesEqual(expected, actual);
+        }
+        finally
+        {
+            Context?.Dispose();
+        }
+    }
+
+    [Theory]
+    [InlineData("Vilnius", 5)]
+    [InlineData("Kaunas", 3)]
+    [InlineData("Klaipėda", 2)]
+    [InlineData("Alytus", 0)]
+    [InlineData("", 0)]
+    [InlineData("  ", 0)]
+    [InlineData(null, 0)]
+    public async Task GetByCityAsync_ShouldReturnCorrectEntities_WhenCityMatches(string? city, int expectedCount)
+    {
+        try
+        {
+            Context = new TestDbContext(CollectionName);
+            Repo = GetRepository(Context);
+            Collection = Context.Database.GetCollection<WifiNetwork>(CollectionName);
+
+            List<WifiNetwork> correctEntityList = [];
+
+            foreach (var entity in TestData)
+            {
+                if(entity.City == city) correctEntityList.Add(entity);
+                await Collection.InsertOneAsync(entity);
+            }
+
+            var entityList = await Repo.GetByCityAsync(city);
+            
+            var actualEntityList = entityList.OrderBy(e => e.Id).ToList();
+            var expectedEntityList = correctEntityList.OrderBy(e => e.Id).ToList();
+
+            Assert.Equal(entityList.Count, expectedCount);
+
+            for (int i = 0; i < expectedCount; i++)
+            {
+                AssertWifiNetworkValuesEqual(expectedEntityList[i], actualEntityList[i]);
+            }
+        }
+        finally
+        {
+            Context?.Dispose();
+        }
     }
 
     protected override WifiRepository GetRepository(TestDbContext context)
@@ -82,5 +117,19 @@ public class WifiRepositoryTests : BaseRepositoryTests<WifiNetwork, WifiReposito
         services.AddScoped<WifiRepository>();
         var serviceProvider = services.BuildServiceProvider();
         return serviceProvider.GetRequiredService<WifiRepository>();
+    }
+
+    private static void AssertWifiNetworkValuesEqual(WifiNetwork expected, WifiNetwork actual)
+    {
+        Assert.Equal(expected.Id, actual.Id);
+        Assert.Equal(expected.UserId, actual.UserId);
+        Assert.Equal(expected.Country, actual.Country);
+        Assert.Equal(expected.City, actual.City);
+        Assert.Equal(expected.PlaceName, actual.PlaceName);
+        Assert.Equal(expected.Street, actual.Street);
+        Assert.Equal(expected.BuildingNumber, actual.BuildingNumber);
+        Assert.Equal(expected.PostalCode, actual.PostalCode);
+        Assert.Equal(expected.IsFree, actual.IsFree);
+        Assert.Equal(expected.Password, actual.Password);
     }
 }
