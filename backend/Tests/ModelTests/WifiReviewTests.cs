@@ -40,6 +40,22 @@ public class WifiReviewTests
     
         Assert.Contains("Text must be between 5 and 100 characters long", exception.Message);
     }
+    
+    [Theory]
+    [InlineData(-2)]
+    [InlineData(0)]
+    [InlineData(11)]
+    [InlineData(19)]
+    [InlineData(89)]
+    [InlineData(653)]
+    public void Rating_ShouldThrowArgumentException_RatingIsInvalid(int rating)
+    {
+        WifiReview wifi = new WifiReview();
+        
+        var exception = Assert.Throws<ArgumentException>(() => wifi.Rating = rating);
+    
+        Assert.Contains("Rating cannot be negative, 0 or above 10", exception.Message);
+    }
 
     private void AssertProperty(PropertyInfo property, object value)
     {
