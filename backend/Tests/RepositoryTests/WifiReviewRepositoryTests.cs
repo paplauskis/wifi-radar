@@ -2,6 +2,7 @@ using API.Data.Repositories;
 using API.Domain.Models;
 using Microsoft.Extensions.DependencyInjection;
 using MongoDB.Driver;
+using Tests.Helpers;
 using Xunit;
 
 namespace Tests.RepositoryTests;
@@ -9,6 +10,7 @@ namespace Tests.RepositoryTests;
 public class WifiReviewRepositoryTests: BaseRepositoryTests<WifiReview, WifiReviewRepository>
 {
     private const string CollectionName = "Reviews";
+    // private readonly List<WifiReview> _testData = JsonHelper.GetWifiReviewTestData();
     
     public WifiReviewRepositoryTests() : base(CollectionName) {}
 
@@ -54,12 +56,48 @@ public class WifiReviewRepositoryTests: BaseRepositoryTests<WifiReview, WifiRevi
             _context = new TestDbContext(CollectionName);
             _repo = GetRepository(_context);
             _collection = _context.Database.GetCollection<WifiReview>(CollectionName);
+            await _collection.InsertManyAsync(_testData);
 
-            var expected = await _repo.AddAsync(entity);
+            var expected = entity;
             var actual = await _repo.GetByIdAsync(entity.Id);
 
             Assert.NotNull(actual);
             AssertWifiReviewValuesEqual(expected, actual);
+        }
+        finally
+        {
+            _context?.Dispose(); 
+        }
+    }
+
+    [Theory]
+    [MemberData(nameof(ValidObjects))]
+    public async Task GetReviewsByWifiIdAsync_ShouldReturnCorrectReviews_WhenWifiIdExists(WifiReview review)
+    {
+        try
+        {
+            _context = new TestDbContext(CollectionName);
+            _repo = GetRepository(_context);
+            _collection = _context.Database.GetCollection<WifiReview>(CollectionName);
+            await _collection.InsertManyAsync(_testData);
+    
+            var expected = _testData
+                .Where(e => e.WifiId == review.WifiId)
+                .OrderBy(e => e.WifiId)
+                .ToList();
+            var fetched = await _repo.GetReviewsByWifiIdAsync(review.WifiId);
+            var actual = fetched
+                .OrderBy(e => e.WifiId)
+                .ToList();
+    
+    
+            Assert.NotNull(actual);
+            Assert.Equal(expected.Count, actual.Count);
+    
+            for (int i = 0; i < expected.Count; i++)
+            {
+                AssertWifiReviewValuesEqual(expected[i], actual[i]);
+            }
         }
         finally
         {
