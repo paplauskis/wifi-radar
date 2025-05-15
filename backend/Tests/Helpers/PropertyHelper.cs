@@ -6,18 +6,18 @@ namespace Tests.Helpers;
 public static class PropertyHelper
 {
     public static IEnumerable<object[]> GetNonNullableStringProperties()
-        => GetProperties<string>(false, ["", "   ", null]);
+        => GetProperties<string>(false, ["", "   ", null], false);
     
     public static IEnumerable<object[]> GetNullableStringProperties()
-        => GetProperties<string>(true, ["", "   "]);
+        => GetProperties<string>(true, ["", "   "], false);
     
     public static IEnumerable<object[]> GetNonNullableIntProperties()
-    => GetProperties<int>(false, [0, -1, -10, -67, int.MinValue, int.MaxValue]);
+    => GetProperties<int>(false, [0, -1, -10, -67, int.MinValue, int.MaxValue], true);
     
     public static IEnumerable<object[]> GetNullableIntProperties()
-        => GetProperties<int>(true, [0, -1, -10, -67, int.MinValue, int.MaxValue]);
+        => GetProperties<int?>(true, [0, -1, -10, -67, int.MinValue, int.MaxValue], true);
     
-    private static IEnumerable<object[]> GetProperties<T>(bool isNullable, T[] testValues, bool isValueProperty = false)
+    private static IEnumerable<object[]> GetProperties<T>(bool isNullable, T[] testValues, bool isValueProperty)
     {
         var valuesToTest = testValues;
         List<PropertyInfo> properties;
@@ -43,9 +43,9 @@ public static class PropertyHelper
         return nullabilityInfo.WriteState == NullabilityState.Nullable;
     }
     
-    private static bool IsValuePropertyNullable<T>(PropertyInfo property)
+    private static bool IsValuePropertyNullable(PropertyInfo property)
     {
-        return Nullable.GetUnderlyingType(typeof(T)) != null;
+        return Nullable.GetUnderlyingType(property.PropertyType) != null;
     }
 
     private static List<PropertyInfo> GetValueProperties<T>(bool isNullable)
@@ -53,7 +53,7 @@ public static class PropertyHelper
         return typeof(WifiNetwork)
             .GetProperties()
             .Where(p => p.PropertyType == typeof(T) &&
-                        IsValuePropertyNullable<T>(p) == isNullable
+                        IsValuePropertyNullable(p) == isNullable
             )
             .ToList();
     }
