@@ -27,13 +27,13 @@ public class WifiRepositoryTests : BaseRepositoryTests<WifiNetwork, WifiReposito
     {
         try
         {
-            _context = new TestDbContext(CollectionName);
-            _repo = GetRepository(_context);
-            _collection = _context.Database.GetCollection<WifiNetwork>(CollectionName);
+            Context = new TestDbContext(CollectionName);
+            Repo = GetRepository(Context);
+            Collection = Context.Database.GetCollection<WifiNetwork>(CollectionName);
 
-            var expected = await _repo.AddAsync(_testData[num]);
+            var expected = await Repo.AddAsync(TestData[num]);
 
-            var actual = await _collection
+            var actual = await Collection
                 .Find(e => e.Id == expected.Id)
                 .FirstOrDefaultAsync();
         
@@ -41,7 +41,7 @@ public class WifiRepositoryTests : BaseRepositoryTests<WifiNetwork, WifiReposito
         }
         finally
         {
-            _context?.Dispose();
+            Context?.Dispose();
         }
     }
 
@@ -51,20 +51,20 @@ public class WifiRepositoryTests : BaseRepositoryTests<WifiNetwork, WifiReposito
     {
         try
         {
-            _context = new TestDbContext(CollectionName);
-            _repo = GetRepository(_context);
-            _collection = _context.Database.GetCollection<WifiNetwork>(CollectionName);
-            await _collection.InsertManyAsync(_testData);
+            Context = new TestDbContext(CollectionName);
+            Repo = GetRepository(Context);
+            Collection = Context.Database.GetCollection<WifiNetwork>(CollectionName);
+            await Collection.InsertManyAsync(TestData);
 
             var expected = entity;
-            var actual = await _repo.GetByIdAsync(entity.Id);
+            var actual = await Repo.GetByIdAsync(entity.Id);
 
             Assert.NotNull(actual);
             AssertWifiNetworkValuesEqual(expected, actual);
         }
         finally
         {
-            _context?.Dispose();
+            Context?.Dispose();
         }
     }
 
@@ -80,19 +80,19 @@ public class WifiRepositoryTests : BaseRepositoryTests<WifiNetwork, WifiReposito
     {
         try
         {
-            _context = new TestDbContext(CollectionName);
-            _repo = GetRepository(_context);
-            _collection = _context.Database.GetCollection<WifiNetwork>(CollectionName);
+            Context = new TestDbContext(CollectionName);
+            Repo = GetRepository(Context);
+            Collection = Context.Database.GetCollection<WifiNetwork>(CollectionName);
 
             List<WifiNetwork> correctEntityList = [];
 
-            foreach (var entity in _testData)
+            foreach (var entity in TestData)
             {
                 if(entity.City == city) correctEntityList.Add(entity);
-                await _collection.InsertOneAsync(entity);
+                await Collection.InsertOneAsync(entity);
             }
 
-            var entityList = await _repo.GetByCityAsync(city);
+            var entityList = await Repo.GetByCityAsync(city);
             
             var actualEntityList = entityList.OrderBy(e => e.Id).ToList();
             var expectedEntityList = correctEntityList.OrderBy(e => e.Id).ToList();
@@ -106,7 +106,7 @@ public class WifiRepositoryTests : BaseRepositoryTests<WifiNetwork, WifiReposito
         }
         finally
         {
-            _context?.Dispose();
+            Context?.Dispose();
         }
     }
 

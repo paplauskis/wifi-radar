@@ -27,13 +27,13 @@ public class WifiReviewRepositoryTests: BaseRepositoryTests<WifiReview, WifiRevi
     {
         try
         {
-            _context = new TestDbContext(CollectionName);
-            _repo = GetRepository(_context);
-            _collection = _context.Database.GetCollection<WifiReview>(CollectionName);
+            Context = new TestDbContext(CollectionName);
+            Repo = GetRepository(Context);
+            Collection = Context.Database.GetCollection<WifiReview>(CollectionName);
 
-            var expected = await _repo.AddAsync(_testData[num]);
+            var expected = await Repo.AddAsync(TestData[num]);
 
-            var actual = await _collection
+            var actual = await Collection
                 .Find(e => e.Id == expected.Id)
                 .FirstOrDefaultAsync();
 
@@ -41,7 +41,7 @@ public class WifiReviewRepositoryTests: BaseRepositoryTests<WifiReview, WifiRevi
         }
         finally
         {
-            _context?.Dispose(); 
+            Context?.Dispose(); 
         }
     }
 
@@ -51,20 +51,20 @@ public class WifiReviewRepositoryTests: BaseRepositoryTests<WifiReview, WifiRevi
     {
         try
         {
-            _context = new TestDbContext(CollectionName);
-            _repo = GetRepository(_context);
-            _collection = _context.Database.GetCollection<WifiReview>(CollectionName);
-            await _collection.InsertManyAsync(_testData);
+            Context = new TestDbContext(CollectionName);
+            Repo = GetRepository(Context);
+            Collection = Context.Database.GetCollection<WifiReview>(CollectionName);
+            await Collection.InsertManyAsync(TestData);
 
             var expected = entity;
-            var actual = await _repo.GetByIdAsync(entity.Id);
+            var actual = await Repo.GetByIdAsync(entity.Id);
 
             Assert.NotNull(actual);
             AssertWifiReviewValuesEqual(expected, actual);
         }
         finally
         {
-            _context?.Dispose(); 
+            Context?.Dispose(); 
         }
     }
 
@@ -74,16 +74,16 @@ public class WifiReviewRepositoryTests: BaseRepositoryTests<WifiReview, WifiRevi
     {
         try
         {
-            _context = new TestDbContext(CollectionName);
-            _repo = GetRepository(_context);
-            _collection = _context.Database.GetCollection<WifiReview>(CollectionName);
-            await _collection.InsertManyAsync(_testData);
+            Context = new TestDbContext(CollectionName);
+            Repo = GetRepository(Context);
+            Collection = Context.Database.GetCollection<WifiReview>(CollectionName);
+            await Collection.InsertManyAsync(TestData);
     
-            var expected = _testData
+            var expected = TestData
                 .Where(e => e.WifiId == review.WifiId)
                 .OrderBy(e => e.WifiId)
                 .ToList();
-            var fetched = await _repo.GetReviewsByWifiIdAsync(review.WifiId);
+            var fetched = await Repo.GetReviewsByWifiIdAsync(review.WifiId);
             var actual = fetched
                 .OrderBy(e => e.WifiId)
                 .ToList();
@@ -99,7 +99,7 @@ public class WifiReviewRepositoryTests: BaseRepositoryTests<WifiReview, WifiRevi
         }
         finally
         {
-            _context?.Dispose(); 
+            Context?.Dispose(); 
         }
     }
 
@@ -116,16 +116,16 @@ public class WifiReviewRepositoryTests: BaseRepositoryTests<WifiReview, WifiRevi
     {
         try
         {
-            _context = new TestDbContext(CollectionName);
-            _repo = GetRepository(_context);
-            _collection = _context.Database.GetCollection<WifiReview>(CollectionName);
+            Context = new TestDbContext(CollectionName);
+            Repo = GetRepository(Context);
+            Collection = Context.Database.GetCollection<WifiReview>(CollectionName);
 
             if (!emptyCollection)
             {
-                await _collection.InsertManyAsync(_testData);
+                await Collection.InsertManyAsync(TestData);
             }
             
-            var fetched = await _repo.GetReviewsByWifiIdAsync(wifiId);
+            var fetched = await Repo.GetReviewsByWifiIdAsync(wifiId);
             var actual = fetched
                 .OrderBy(e => e.WifiId)
                 .ToList();
@@ -134,7 +134,7 @@ public class WifiReviewRepositoryTests: BaseRepositoryTests<WifiReview, WifiRevi
         }
         finally
         {
-            _context?.Dispose(); 
+            Context?.Dispose(); 
         }
     }
 

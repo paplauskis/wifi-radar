@@ -28,13 +28,13 @@ public class UserRepositoryTests : BaseRepositoryTests<User, UserRepository>
     {
         try
         {
-            _context = new TestDbContext(CollectionName);
-            _repo = GetRepository(_context);
-            _collection = _context.Database.GetCollection<User>(CollectionName);
+            Context = new TestDbContext(CollectionName);
+            Repo = GetRepository(Context);
+            Collection = Context.Database.GetCollection<User>(CollectionName);
 
-            var expected = await _repo.AddAsync(_testData[num]);
+            var expected = await Repo.AddAsync(TestData[num]);
 
-            var actual = await _collection
+            var actual = await Collection
                 .Find(e => e.Id == expected.Id)
                 .FirstOrDefaultAsync();
         
@@ -42,7 +42,7 @@ public class UserRepositoryTests : BaseRepositoryTests<User, UserRepository>
         }
         finally
         {
-            _context?.Dispose();
+            Context?.Dispose();
         }
     }
 
@@ -52,20 +52,20 @@ public class UserRepositoryTests : BaseRepositoryTests<User, UserRepository>
     {
         try
         {
-            _context = new TestDbContext(CollectionName);
-            _repo = GetRepository(_context);
-            _collection = _context.Database.GetCollection<User>(CollectionName);
-            await _collection.InsertManyAsync(_testData);
+            Context = new TestDbContext(CollectionName);
+            Repo = GetRepository(Context);
+            Collection = Context.Database.GetCollection<User>(CollectionName);
+            await Collection.InsertManyAsync(TestData);
             
             var expected = entity;
-            var actual = await _repo.GetByIdAsync(entity.Id);
+            var actual = await Repo.GetByIdAsync(entity.Id);
 
             Assert.NotNull(actual);
             AssertUserValuesEqual(expected, actual);
         }
         finally
         {
-            _context?.Dispose();
+            Context?.Dispose();
         }
     }
 
@@ -75,20 +75,20 @@ public class UserRepositoryTests : BaseRepositoryTests<User, UserRepository>
     {
         try
         {
-            _context = new TestDbContext(CollectionName);
-            _repo = GetRepository(_context);
-            _collection = _context.Database.GetCollection<User>(CollectionName);
-            await _collection.InsertManyAsync(_testData);
+            Context = new TestDbContext(CollectionName);
+            Repo = GetRepository(Context);
+            Collection = Context.Database.GetCollection<User>(CollectionName);
+            await Collection.InsertManyAsync(TestData);
 
             var expected = entity;
-            var actual = await _repo.GetByUsernameAsync(entity.Username);
+            var actual = await Repo.GetByUsernameAsync(entity.Username);
 
             Assert.NotNull(actual);
             AssertUserValuesEqual(expected, actual);
         }
         finally
         {
-            _context?.Dispose();
+            Context?.Dispose();
         }
     }
 
@@ -97,18 +97,18 @@ public class UserRepositoryTests : BaseRepositoryTests<User, UserRepository>
     {
         try
         {
-            _context = new TestDbContext(CollectionName);
-            _repo = GetRepository(_context);
-            _collection = _context.Database.GetCollection<User>(CollectionName);
+            Context = new TestDbContext(CollectionName);
+            Repo = GetRepository(Context);
+            Collection = Context.Database.GetCollection<User>(CollectionName);
 
             var randomUsername = Guid.NewGuid().ToString();
-            var fetchedEntity = await _repo.GetByUsernameAsync(randomUsername);
+            var fetchedEntity = await Repo.GetByUsernameAsync(randomUsername);
 
             Assert.Null(fetchedEntity);
         }
         finally
         {
-            _context?.Dispose();
+            Context?.Dispose();
         }
     }
     
@@ -120,17 +120,17 @@ public class UserRepositoryTests : BaseRepositoryTests<User, UserRepository>
     {
         try
         {
-            _context = new TestDbContext(CollectionName);
-            _repo = GetRepository(_context);
-            _collection = _context.Database.GetCollection<User>(CollectionName);
+            Context = new TestDbContext(CollectionName);
+            Repo = GetRepository(Context);
+            Collection = Context.Database.GetCollection<User>(CollectionName);
             
-            var result = await _repo.GetByUsernameAsync(username);
+            var result = await Repo.GetByUsernameAsync(username);
 
             Assert.Null(result);
         }
         finally
         {
-            _context?.Dispose();
+            Context?.Dispose();
         }
     }
 
