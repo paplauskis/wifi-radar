@@ -11,6 +11,9 @@ public static class PropertyHelper
     public static IEnumerable<object[]> GetNullableStringProperties()
         => GetProperties<string>(true, ["", "   "]);
     
+    public static IEnumerable<object[]> GetNonNullableIntProperties()
+    => GetProperties<int>(false, [0, -1, -10, -67, int.MinValue, int.MaxValue]);
+    
     private static IEnumerable<object[]> GetProperties<T>(bool isNullable, T[] testValues, bool isValueProperty = false)
     {
         var valuesToTest = testValues;
