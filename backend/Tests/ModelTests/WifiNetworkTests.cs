@@ -14,7 +14,7 @@ public class WifiNetworkTests
         
         var exception = Assert.Throws<ArgumentException>(() => property.SetValue(wifi, value));
     
-        Assert.Contains($"{property.Name} cannot be null or empty or whitespace", exception.Message);
+        Assert.Contains($"{property.Name} cannot be null, empty or whitespace", exception.Message);
     }
     
     [Theory]
@@ -25,7 +25,7 @@ public class WifiNetworkTests
         
         var exception = Assert.Throws<ArgumentException>(() => property.SetValue(wifi, value));
     
-        Assert.Contains($"{property.Name} cannot be null or empty or whitespace", exception.Message);
+        Assert.Contains($"{property.Name} cannot be empty or whitespace", exception.Message);
     }
 
     private static IEnumerable<object[]> GetProperties<T>(bool isNullable, T[] testValues)
@@ -47,10 +47,10 @@ public class WifiNetworkTests
     }
 
     public static IEnumerable<object[]> GetNonNullableStringProperties()
-        => GetProperties<string>(false, ["", "   "]);
+        => GetProperties<string>(false, ["", "   ", null]);
     
     public static IEnumerable<object[]> GetNullableStringProperties()
-        => GetProperties<string>(true, ["", "   ", null]);
+        => GetProperties<string>(true, ["", "   "]);
 
     private static bool IsReferencePropertyNullable(PropertyInfo property)
     {
