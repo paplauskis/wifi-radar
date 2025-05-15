@@ -28,4 +28,26 @@ public class WifiNetworkTests
     
         Assert.Contains($"{property.Name} cannot be empty or whitespace", exception.Message);
     }
+    
+    [Theory]
+    [MemberData(nameof(PropertyHelper.GetNonNullableIntProperties), MemberType = typeof(PropertyHelper))]
+    public void NonNullableIntProperty_ShouldThrowArgumentException_WhenValueIsInvalid(PropertyInfo property, int value)
+    {
+        var wifi = new WifiNetwork();
+        
+        var exception = Assert.Throws<ArgumentException>(() => property.SetValue(wifi, value));
+    
+        Assert.Contains($"{property.Name} cannot be set to {value}", exception.Message);
+    }
+    
+    [Theory]
+    [MemberData(nameof(PropertyHelper.GetNullableIntProperties), MemberType = typeof(PropertyHelper))]
+    public void NullableIntProperty_ShouldThrowArgumentException_WhenValueIsInvalid(PropertyInfo property, int? value)
+    {
+        var wifi = new WifiNetwork();
+        
+        var exception = Assert.Throws<ArgumentException>(() => property.SetValue(wifi, value));
+    
+        Assert.Contains($"{property.Name} cannot be set to {value}", exception.Message);
+    }
 }
