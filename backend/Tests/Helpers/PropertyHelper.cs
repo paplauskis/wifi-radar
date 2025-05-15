@@ -3,29 +3,17 @@ using API.Domain.Models;
 
 namespace Tests.Helpers;
 
-public static class PropertyHelper
+internal abstract class PropertyHelper
 {
-    public static IEnumerable<object[]> GetNonNullableStringProperties()
-        => GetProperties<string>(false, ["", "   ", null], false);
-    
-    public static IEnumerable<object[]> GetNullableStringProperties()
-        => GetProperties<string>(true, ["", "   "], false);
-    
-    public static IEnumerable<object[]> GetNonNullableIntProperties()
-    => GetProperties<int>(false, [0, -1, -10, -67, int.MinValue, int.MaxValue], true);
-    
-    public static IEnumerable<object[]> GetNullableIntProperties()
-        => GetProperties<int?>(true, [0, -1, -10, -67, int.MinValue, int.MaxValue], true);
-    
-    private static IEnumerable<object[]> GetProperties<T>(bool isNullable, T[] testValues, bool isValueProperty)
+    protected static IEnumerable<object[]> GetProperties<TProperty, TTestObject>(bool isNullable, TProperty[] testValues, bool isValueProperty)
     {
         var valuesToTest = testValues;
         List<PropertyInfo> properties;
 
         if (isValueProperty) 
-            properties = GetValueProperties<T>(isNullable);
+            properties = GetValueProperties<TProperty, TTestObject>(isNullable);
         else
-            properties = GetReferenceProperties<T>(isNullable);
+            properties = GetReferenceProperties<TProperty, TTestObject>(isNullable);
         
         foreach (var prop in properties)
         {
@@ -48,21 +36,21 @@ public static class PropertyHelper
         return Nullable.GetUnderlyingType(property.PropertyType) != null;
     }
 
-    private static List<PropertyInfo> GetValueProperties<T>(bool isNullable)
+    private static List<PropertyInfo> GetValueProperties<TProperty, TTestObject>(bool isNullable)
     {
-        return typeof(WifiNetwork)
+        return typeof(TTestObject)
             .GetProperties()
-            .Where(p => p.PropertyType == typeof(T) &&
+            .Where(p => p.PropertyType == typeof(TProperty) &&
                         IsValuePropertyNullable(p) == isNullable
             )
             .ToList();
     }
     
-    private static List<PropertyInfo> GetReferenceProperties<T>(bool isNullable)
+    private static List<PropertyInfo> GetReferenceProperties<TProperty, TTestObject>(bool isNullable)
     {
-        return typeof(WifiNetwork)
+        return typeof(TTestObject)
             .GetProperties()
-            .Where(p => p.PropertyType == typeof(T) &&
+            .Where(p => p.PropertyType == typeof(TProperty) &&
                         IsReferencePropertyNullable(p) == isNullable
             ).ToList();
     }
