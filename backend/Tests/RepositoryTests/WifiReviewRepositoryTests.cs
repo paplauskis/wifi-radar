@@ -105,6 +105,41 @@ public class WifiReviewRepositoryTests: BaseRepositoryTests<WifiReview, WifiRevi
         }
     }
 
+    [Theory]
+    [InlineData(null)]
+    [InlineData("")]
+    [InlineData("   ")]
+    [InlineData("RANDOM_ID")]
+    [InlineData(null, true)]
+    [InlineData("", true)]
+    [InlineData("   ", true)]
+    [InlineData("RANDOM_ID", true)]
+    public async Task GetReviewsByWifiIdAsync_ShouldReturnNoReviews_WhenWifiIdIsInvalid(string? wifiId, bool emptyCollection = false)
+    {
+        try
+        {
+            _context = new TestDbContext(CollectionName);
+            _repo = GetRepository(_context);
+            _collection = _context.Database.GetCollection<WifiReview>(CollectionName);
+
+            if (!emptyCollection)
+            {
+                await _collection.InsertManyAsync(_testData);
+            }
+            
+            var fetched = await _repo.GetReviewsByWifiIdAsync(wifiId);
+            var actual = fetched
+                .OrderBy(e => e.WifiId)
+                .ToList();
+
+            Assert.Empty(actual);
+        }
+        finally
+        {
+            _context?.Dispose(); 
+        }
+    }
+
     protected override WifiReviewRepository GetRepository(TestDbContext context)
     {
         var services = new ServiceCollection();
