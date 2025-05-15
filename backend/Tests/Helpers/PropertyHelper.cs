@@ -11,15 +11,16 @@ public static class PropertyHelper
     public static IEnumerable<object[]> GetNullableStringProperties()
         => GetProperties<string>(true, ["", "   "]);
     
-    private static IEnumerable<object[]> GetProperties<T>(bool isNullable, T[] testValues)
+    private static IEnumerable<object[]> GetProperties<T>(bool isNullable, T[] testValues, bool isValueProperty = false)
     {
         var valuesToTest = testValues;
+        List<PropertyInfo> properties;
 
-        var properties = typeof(WifiNetwork)
-            .GetProperties()
-            .Where(p => p.PropertyType == typeof(T) && IsReferencePropertyNullable(p) == isNullable)
-            .ToList();
-
+        if (isValueProperty) 
+            properties = GetValueProperties<T>(isNullable);
+        else
+            properties = GetReferenceProperties<T>(isNullable);
+        
         foreach (var prop in properties)
         {
             foreach (var value in valuesToTest)
@@ -34,5 +35,29 @@ public static class PropertyHelper
         var nullabilityContext = new NullabilityInfoContext();
         var nullabilityInfo = nullabilityContext.Create(property);
         return nullabilityInfo.WriteState == NullabilityState.Nullable;
+    }
+    
+    private static bool IsValuePropertyNullable<T>(PropertyInfo property)
+    {
+        return Nullable.GetUnderlyingType(typeof(T)) != null;
+    }
+
+    private static List<PropertyInfo> GetValueProperties<T>(bool isNullable)
+    {
+        return typeof(WifiNetwork)
+            .GetProperties()
+            .Where(p => p.PropertyType == typeof(T) &&
+                        IsValuePropertyNullable<T>(p) == isNullable
+            )
+            .ToList();
+    }
+    
+    private static List<PropertyInfo> GetReferenceProperties<T>(bool isNullable)
+    {
+        return typeof(WifiNetwork)
+            .GetProperties()
+            .Where(p => p.PropertyType == typeof(T) &&
+                        IsReferencePropertyNullable(p) == isNullable
+            ).ToList();
     }
 }
