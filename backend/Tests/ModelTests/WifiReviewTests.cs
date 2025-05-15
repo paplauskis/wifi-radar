@@ -28,6 +28,19 @@ public class WifiReviewTests
         AssertProperty(property, value);
     }
 
+    [Theory]
+    [InlineData("aa")]
+    [InlineData("abcd")]
+    [InlineData("text text text text text text text text text text text text text text text text text text text text text")]
+    public void Text_ShouldThrowArgumentException_WhenTextLengthIsInvalid(string text)
+    {
+        WifiReview wifi = new WifiReview();
+        
+        var exception = Assert.Throws<ArgumentException>(() => wifi.Text = text);
+    
+        Assert.Contains("Text must be between 5 and 100 characters long", exception.Message);
+    }
+
     private void AssertProperty(PropertyInfo property, object value)
     {
         var wifi = new WifiReview();
