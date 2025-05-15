@@ -30,4 +30,19 @@ public class UserTests
         
         Assert.Contains("Username is too long, maximum length is 20", exception.Message);
     }
+    
+    [Theory]
+    [InlineData("123")]
+    [InlineData("abc")]
+    [InlineData("pass123")]
+    [InlineData("")]
+    [InlineData("")]
+    public void Password_ShouldThrowArgumentException_WhenTooShort(string password)
+    {
+        var user = new User();
+        
+        var exception = Assert.Throws<ArgumentException>(() => user.Password = password);
+        
+        Assert.Contains("Password must be at least 8 characters", exception.Message);
+    }
 }
