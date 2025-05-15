@@ -2,6 +2,7 @@ using API.Data.Repositories;
 using API.Domain.Models;
 using Microsoft.Extensions.DependencyInjection;
 using MongoDB.Driver;
+using Tests.Helpers;
 using Xunit;
 
 namespace Tests.RepositoryTests;
@@ -9,7 +10,7 @@ namespace Tests.RepositoryTests;
 public class UserRepositoryTests : BaseRepositoryTests<User, UserRepository>
 {
     private const string CollectionName = "Users";
-    
+    // private readonly List<User> _testData = JsonHelper.GetUserTestData();
     public UserRepositoryTests() : base(CollectionName) {}
 
 
@@ -55,8 +56,9 @@ public class UserRepositoryTests : BaseRepositoryTests<User, UserRepository>
             _context = new TestDbContext(CollectionName);
             _repo = GetRepository(_context);
             _collection = _context.Database.GetCollection<User>(CollectionName);
-
-            var expected = await _repo.AddAsync(entity);
+            await _collection.InsertManyAsync(_testData);
+            
+            var expected = entity;
             var actual = await _repo.GetByIdAsync(entity.Id);
 
             Assert.NotNull(actual);
@@ -77,8 +79,9 @@ public class UserRepositoryTests : BaseRepositoryTests<User, UserRepository>
             _context = new TestDbContext(CollectionName);
             _repo = GetRepository(_context);
             _collection = _context.Database.GetCollection<User>(CollectionName);
-        
-            var expected = await _repo.AddAsync(entity);
+            await _collection.InsertManyAsync(_testData);
+
+            var expected = entity;
             var actual = await _repo.GetByUsernameAsync(entity.Username);
 
             Assert.NotNull(actual);
