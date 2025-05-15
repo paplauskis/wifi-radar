@@ -36,7 +36,7 @@ public class UserTests
     [InlineData("abc")]
     [InlineData("pass123")]
     [InlineData("")]
-    [InlineData("")]
+    [InlineData("   ")]
     public void Password_ShouldThrowArgumentException_WhenTooShort(string password)
     {
         var user = new User();
