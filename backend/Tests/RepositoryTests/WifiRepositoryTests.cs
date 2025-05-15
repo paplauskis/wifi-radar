@@ -3,6 +3,7 @@ using API.Data.Repositories;
 using API.Domain.Models;
 using Microsoft.Extensions.DependencyInjection;
 using MongoDB.Driver;
+using Tests.Helpers;
 using Xunit;
 
 namespace Tests.RepositoryTests;
@@ -10,7 +11,7 @@ namespace Tests.RepositoryTests;
 public class WifiRepositoryTests : BaseRepositoryTests<WifiNetwork, WifiRepository>
 {
     private const string CollectionName = "Favorite-WiFi-Spots";
-
+    // private readonly List<WifiNetwork> _testData = JsonHelper.GetWifiNetworkTestData();
     public WifiRepositoryTests() : base(CollectionName) {}
     
     [Theory]
@@ -55,12 +56,13 @@ public class WifiRepositoryTests : BaseRepositoryTests<WifiNetwork, WifiReposito
             _context = new TestDbContext(CollectionName);
             _repo = GetRepository(_context);
             _collection = _context.Database.GetCollection<WifiNetwork>(CollectionName);
+            await _collection.InsertManyAsync(_testData);
 
-            var insertedEntity = await _repo.AddAsync(entity);
-            var fetchedEntity = await _repo.GetByIdAsync(entity.Id);
+            var expected = entity;
+            var actual = await _repo.GetByIdAsync(entity.Id);
 
-            Assert.NotNull(fetchedEntity);
-            AssertWifiNetworkValuesEqual(insertedEntity, fetchedEntity);
+            Assert.NotNull(actual);
+            AssertWifiNetworkValuesEqual(expected, actual);
         }
         finally
         {
@@ -89,7 +91,7 @@ public class WifiRepositoryTests : BaseRepositoryTests<WifiNetwork, WifiReposito
             foreach (var entity in _testData)
             {
                 if(entity.City == city) correctEntityList.Add(entity);
-                await _repo.AddAsync(entity);
+                await _collection.InsertOneAsync(entity);
             }
 
             var entityList = await _repo.GetByCityAsync(city);
