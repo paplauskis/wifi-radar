@@ -16,14 +16,25 @@ public class WifiNetworkTests
     
         Assert.Contains($"{property.Name} cannot be null or empty or whitespace", exception.Message);
     }
-
-    private static IEnumerable<object[]> GetStringProperties(bool isNullable)
+    
+    [Theory]
+    [MemberData(nameof(GetNullableStringProperties))]
+    public void NullableStringProperty_ShouldThrowArgumentException_WhenIsEmptyOrWhitespace(PropertyInfo property, string value)
     {
-        var valuesToTest = new string[] {"", "   " };
+        var wifi = new WifiNetwork();
+        
+        var exception = Assert.Throws<ArgumentException>(() => property.SetValue(wifi, value));
+    
+        Assert.Contains($"{property.Name} cannot be null or empty or whitespace", exception.Message);
+    }
+
+    private static IEnumerable<object[]> GetProperties<T>(bool isNullable, T[] testValues)
+    {
+        var valuesToTest = testValues;
 
         var properties = typeof(WifiNetwork)
             .GetProperties()
-            .Where(p => p.PropertyType == typeof(string) && IsPropertyNullable(p) == isNullable)
+            .Where(p => p.PropertyType == typeof(T) && IsReferencePropertyNullable(p) == isNullable)
             .ToList();
 
         foreach (var prop in properties)
@@ -36,12 +47,12 @@ public class WifiNetworkTests
     }
 
     public static IEnumerable<object[]> GetNonNullableStringProperties()
-        => GetStringProperties(false);
+        => GetProperties<string>(false, ["", "   "]);
     
     public static IEnumerable<object[]> GetNullableStringProperties()
-        => GetStringProperties(true);
+        => GetProperties<string>(true, ["", "   ", null]);
 
-    private static bool IsPropertyNullable(PropertyInfo property)
+    private static bool IsReferencePropertyNullable(PropertyInfo property)
     {
         var nullabilityContext = new NullabilityInfoContext();
         var nullabilityInfo = nullabilityContext.Create(property);
