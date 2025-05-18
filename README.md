@@ -5,6 +5,21 @@
 - backend - ASP.NET
 - DB - MongoDB
 
+### API endpoints
+
+- GET api/map/search?city={value}
+- GET api/map/search?city={value}&radius={value}
+- POST api/user/favorites/{userId} (wifi object)
+- GET api/user/favorites/{userId}
+- DELETE api/user/favorites/{userId} (wifi id)
+- POST api/wifi/comment/{wifiId} (per body perduot user, comment, rating)
+- GET api/wifi/comment/{wifiId}
+- DELETE api/wifi/comment/{wifiId} (userId/token)
+- POST /api/wifi/password/{wifiId} (body - password, userId)
+- GET api/wifi/password/{wifiId}
+  
+  
+
 ###  Funkcionalumai:
 - pasirinktam mieste arba tam tikru perimetru gauti nemokamus ir viesai prieinamus wifi tinklus
 - leisti naudotojams parasyti komentarus apie tam tikrus wifi tinklus
