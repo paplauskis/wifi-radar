@@ -20,7 +20,7 @@ public class UserFavoriteController : ControllerBase
     {
         try
         { 
-            var favorites = await _userFavoriteService.GetUserFavorites(userId);
+            var favorites = await _userFavoriteService.GetUserFavoritesAsync(userId);
             return Ok(favorites);
         }
         catch (Exception e) // specific exception handling will be implemented later
@@ -34,7 +34,7 @@ public class UserFavoriteController : ControllerBase
     {
         try
         { 
-            var addedFavorite = await _userFavoriteService.AddUserFavorite(userId, wifi);
+            var addedFavorite = await _userFavoriteService.AddUserFavoriteAsync(userId, wifi);
             return Ok(addedFavorite);
         }
         catch (Exception e) // specific exception handling will be implemented later
@@ -48,8 +48,8 @@ public class UserFavoriteController : ControllerBase
     {
         try
         { 
-            var deletedFavorite = await _userFavoriteService.DeleteUserFavorite(userId, wifiId);
-            return Ok(deletedFavorite);
+            await _userFavoriteService.DeleteUserFavoriteAsync(userId, wifiId);
+            return Ok();
         }
         catch (Exception e) // specific exception handling will be implemented later
         {
