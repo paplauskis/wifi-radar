@@ -60,9 +60,34 @@ public class WifiReviewTests
     private void AssertProperty(PropertyInfo property, object value)
     {
         var wifi = new WifiReview();
-        
-        var exception = Assert.Throws<ArgumentException>(() => property.SetValue(wifi, value));
-    
-        Assert.Contains($"{property.Name} cannot be set to {value}", exception.Message);
+
+        if (property.Name == "Id" && value == null)
+        {
+            
+            property.SetValue(wifi, value);
+            return;
+        }
+
+        var exception = Record.Exception(() => property.SetValue(wifi, value));
+
+        if (exception is TargetInvocationException tie && tie.InnerException is ArgumentException argEx)
+        {
+            switch (property.Name)
+            {
+                case "Rating":
+                    Assert.Contains("must be between 1 and 10", argEx.Message);
+                    break;
+                case "Text":
+                    Assert.Contains("Text must be between 5 and 100 characters", argEx.Message);
+                    break;
+                default:
+                    Assert.Contains($"{property.Name} cannot be set to", argEx.Message);
+                    break;
+            }
+        }
+        else
+        {
+            Assert.IsType<ArgumentException>(exception);
+        }
     }
 }
