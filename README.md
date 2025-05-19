@@ -12,9 +12,9 @@
 - POST api/user/favorites/{userId} (wifi object)
 - GET api/user/favorites/{userId}
 - DELETE api/user/favorites/{userId} (wifi id)
-- POST api/wifi/comment/{wifiId} (per body perduot user, comment, rating)
-- GET api/wifi/comment/{wifiId}
-- DELETE api/wifi/comment/{wifiId} (userId/token)
+- POST api/wifi/review/{wifiId} (per body perduot user, comment, rating)
+- GET api/wifi/review/{wifiId}
+- DELETE api/wifi/review/{wifiId} (userId/token)
 - POST /api/wifi/password/{wifiId} (body - password, userId)
 - GET api/wifi/password/{wifiId}
 - POST api/user/auth/login (body - username, email)
