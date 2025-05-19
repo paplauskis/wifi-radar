@@ -4,8 +4,8 @@ namespace Tests.ControllerTests;
 
 public class UserControllerTests
 {
-    [Fact]
-    public void Test1()
-    {
-    }
+    // [Fact]
+    // public void Test1()
+    // {
+    // }
 }
