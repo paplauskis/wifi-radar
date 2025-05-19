@@ -1,3 +1,5 @@
+using Xunit;
+
 namespace Tests.ServiceTests.Wifi;
 
 public class WifiPasswordSharingTests

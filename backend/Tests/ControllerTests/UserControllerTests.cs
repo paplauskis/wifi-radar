@@ -1,3 +1,5 @@
+using Xunit;
+
 namespace Tests.ControllerTests;
 
 public class UserControllerTests

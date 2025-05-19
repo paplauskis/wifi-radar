@@ -38,9 +38,10 @@ public class WifiNetworkTests
     private void AssertProperty(PropertyInfo property, object value)
     {
         var wifi = new WifiNetwork();
-        
-        var exception = Assert.Throws<ArgumentException>(() => property.SetValue(wifi, value));
-    
-        Assert.Contains($"{property.Name} cannot be set to {value}", exception.Message);
+
+        var ex = Assert.Throws<TargetInvocationException>(() => property.SetValue(wifi, value));
+
+        Assert.IsType<ArgumentException>(ex.InnerException);
+        Assert.Contains($"{property.Name} cannot be set to {value}", ex.InnerException!.Message);
     }
 }
