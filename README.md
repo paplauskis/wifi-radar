@@ -17,6 +17,8 @@
 - DELETE api/wifi/comment/{wifiId} (userId/token)
 - POST /api/wifi/password/{wifiId} (body - password, userId)
 - GET api/wifi/password/{wifiId}
+- POST api/user/auth/login (body - username, email)
+- POST api/user/auth/register (body - username, email)
   
   
 
