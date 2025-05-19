@@ -14,7 +14,6 @@
 - DELETE api/user/favorites/{userId} (wifi id)
 - POST api/wifi/review/{wifiId} (per body perduot user, comment, rating)
 - GET api/wifi/review/{wifiId}
-- DELETE api/wifi/review/{wifiId} (userId/token)
 - POST /api/wifi/password/{wifiId} (body - password, userId)
 - GET api/wifi/password/{wifiId}
 - POST api/user/auth/login (body - username, email)
