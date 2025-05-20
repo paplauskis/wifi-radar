@@ -1,8 +1,10 @@
 using API.Data.Repositories;
 using API.Data.Repositories.Interfaces;
 using API.Services.Database;
+using API.Services.Interfaces.Map;
 using API.Services.Interfaces.User;
 using API.Services.Interfaces.Wifi;
+using API.Services.Map;
 using API.Services.User;
 using API.Services.Wifi;
 using MongoDB.Driver;
@@ -26,6 +28,7 @@ builder.Services.AddScoped<IUserFavoriteService, UserFavoriteService>();
 builder.Services.AddScoped<IUserAuthService, UserAuthService>();
 builder.Services.AddScoped<IWifiPasswordSharingService, WifiPasswordSharingService>();
 builder.Services.AddScoped<IUserReviewService, UserReviewService>();
+builder.Services.AddScoped<IMapService, MapService>();
 
 builder.Services.AddCors(options =>
 {
