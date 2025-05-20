@@ -10,12 +10,12 @@ public class UserAuthService : IUserAuthService
         
     }
 
-    public Task<UserLoginResponseDto> HandleUserLogin(UserLoginRequestDto userRequestDto)
+    public async Task<UserLoginResponseDto> HandleUserLogin(UserLoginRequestDto userRequestDto)
     {
         throw new NotImplementedException();
     }
 
-    public Task<UserLoginResponseDto> HandleUserRegistration(UserLoginRequestDto userRequestDto)
+    public async Task<UserLoginResponseDto> HandleUserRegistration(UserLoginRequestDto userRequestDto)
     {
         throw new NotImplementedException();
     }
