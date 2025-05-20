@@ -47,6 +47,32 @@ public class WifiController : ControllerBase
             return BadRequest(e.Message);
         }
     }
+
+    [HttpGet("/password/{wifiId}")]
+    public async Task<IActionResult> GetPasswords([FromRoute] string wifiId)
+    {
+        try
+        {
+            var passwords = await _wifiPasswordSharingService.GetPasswordsAsync(wifiId);
+            return Ok(passwords);
+        }
+        catch (Exception e) // specific exception handling will be implemented later
+        {
+            return BadRequest(e.Message);
+        }
+    }
+
+    [HttpPost("/password/{wifiId}")]
+    public async Task<IActionResult> AddPassword([FromRoute] string wifiId, [FromBody] PasswordDto passwordDto)
+    {
+        try
+        {
+            var password = await _wifiPasswordSharingService.AddPasswordAsync(passwordDto);
+            return Ok(password);
+        }
+        catch (Exception e) // specific exception handling will be implemented later
+        {
+            return BadRequest(e.Message);
+        }
+    }
 }
-// POST /api/wifi/password/{wifiId} (body - password, userId)
-// GET api/wifi/password/{wifiId}
