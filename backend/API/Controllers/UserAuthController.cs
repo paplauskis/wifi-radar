@@ -1,11 +1,13 @@
 using API.Domain;
 using API.Domain.Dto;
 using API.Services.Interfaces.User;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace API.Controllers;
 
 [ApiController]
+[AllowAnonymous]
 [Route("/api/user/auth")]
 public class UserAuthController : ControllerBase
 {
@@ -16,7 +18,7 @@ public class UserAuthController : ControllerBase
         _userAuthService = userAuthService;
     }
     
-    [HttpPost("/login")]
+    [HttpPost("login")]
     public async Task<IActionResult> Login([FromBody] UserLoginRequestDto userRequestDto)
     {
         try
@@ -34,7 +36,7 @@ public class UserAuthController : ControllerBase
         }
     }
     
-    [HttpPost("/register")]
+    [HttpPost("register")]
     public async Task<IActionResult> Register([FromBody] UserLoginRequestDto userRequestDto)
     {
         try
