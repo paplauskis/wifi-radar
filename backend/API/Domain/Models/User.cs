@@ -1,3 +1,4 @@
+using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
 using System;
 using System.Linq;
@@ -6,6 +7,7 @@ namespace API.Domain.Models
 {
     public class User : TimeStampedEntity
     {
+
         private string _username;
 
         [BsonElement("Username")]
@@ -24,6 +26,9 @@ namespace API.Domain.Models
 
         [BsonElement("Password")]
         public string Password { get; set; }
+
+        [BsonElement("FavoriteNetworkIds")]
+        public List<string> FavoriteNetworkIds { get; set; } = new();
 
         public User() { }
 
