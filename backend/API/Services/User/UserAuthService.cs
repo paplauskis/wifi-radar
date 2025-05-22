@@ -34,6 +34,24 @@ public class UserAuthService : IUserAuthService
 
     public async Task<UserLoginResponseDto> HandleUserRegistration(UserLoginRequestDto userRequestDto)
     {
-        throw new NotImplementedException();
+        if (string.IsNullOrEmpty(userRequestDto.Username) || string.IsNullOrEmpty(userRequestDto.Password))
+        {
+            throw new ArgumentNullException(nameof(userRequestDto), "Username or password cannot be null.");
+        }
+        
+        if (!UserValidator.IsPasswordValid(userRequestDto.Password))
+        {
+            throw new ArgumentException("Password is invalid.");
+        }
+        
+        var existingUser = await _userRepository.GetByUsernameAsync(userRequestDto.Username);
+        if (existingUser != null) throw new UserAlreadyExistsException($"User with username {userRequestDto.Username} already exists.");
+
+        var newUser = new Domain.Models.User();
+        newUser.Username = userRequestDto.Username;
+        newUser.Password = _passwordHelper.HashPassword(newUser, userRequestDto.Password);
+        await _userRepository.AddAsync(newUser);
+        
+        return await HandleUserLogin(userRequestDto);
     }
 }
