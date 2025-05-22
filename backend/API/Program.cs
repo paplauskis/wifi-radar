@@ -1,7 +1,9 @@
 using System.Text;
 using API.Data.Repositories;
 using API.Data.Repositories.Interfaces;
+using API.Domain.Models;
 using API.Helpers;
+using API.Services.Auth;
 using API.Services.Database;
 using API.Services.Interfaces.Auth;
 using API.Services.Interfaces.Map;
@@ -11,6 +13,7 @@ using API.Services.Map;
 using API.Services.User;
 using API.Services.Wifi;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.IdentityModel.Tokens;
 using MongoDB.Driver;
 
@@ -34,7 +37,9 @@ builder.Services.AddScoped<IUserAuthService, UserAuthService>();
 builder.Services.AddScoped<IWifiPasswordSharingService, WifiPasswordSharingService>();
 builder.Services.AddScoped<IUserReviewService, UserReviewService>();
 builder.Services.AddScoped<IMapService, MapService>();
-builder.Services.AddScoped<IPasswordHelper, PasswordHelper>();
+builder.Services.AddScoped<IPasswordHasher<User>, PasswordHasher<User>>();
+builder.Services.AddScoped<IPasswordHelper, PasswordService>();
+builder.Services.AddScoped<IAuthenticatable, JwtService>();
 
 builder.Services.AddCors(options =>
 {
