@@ -1,4 +1,4 @@
-using API.Data.Repositories.Interfaces;
+using API.Data.Repositories.Interfaces; 
 using API.Services.Interfaces.Wifi;
 using API.Domain.Models;
 
@@ -13,8 +13,8 @@ public class WifiSearchService : IWifiSearchService
         _wifiRepository = repo;
     }
 
-    public async Task<List<WifiNetwork>> GetWifi()
+    public async Task<List<WifiNetwork>> GetWifi(string city)
     {
-        throw new NotImplementedException();
+        return await _wifiRepository.GetByCityAsync(city);
     }
 }
