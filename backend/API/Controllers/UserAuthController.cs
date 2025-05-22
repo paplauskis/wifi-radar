@@ -1,4 +1,4 @@
-using API.Domain;
+using API.Domain.Dto;
 using API.Services.Interfaces.User;
 using Microsoft.AspNetCore.Mvc;
 

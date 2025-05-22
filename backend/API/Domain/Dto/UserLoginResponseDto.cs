@@ -1,4 +1,4 @@
-namespace API.Domain;
+namespace API.Domain.Dto;
 
 public class UserLoginResponseDto
 {
