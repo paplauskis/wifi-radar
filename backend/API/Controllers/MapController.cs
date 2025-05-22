@@ -14,7 +14,7 @@ public class MapController : ControllerBase
         _mapService = mapService;
     }
     
-    [HttpGet("/search")]
+    [HttpGet("search")]
     public async Task<IActionResult> Search([FromQuery] string city, [FromQuery] int? radius) //radius in meters
     {
         try

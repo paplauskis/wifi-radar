@@ -19,7 +19,7 @@ public class WifiController : ControllerBase
         _wifiPasswordSharingService = wifiPasswordSharingService;
     }
 
-    [HttpGet("/review/{wifiId}")]
+    [HttpGet("review/{wifiId}")]
     public async Task<IActionResult> GetWifiReviews([FromRoute] string wifiId)
     {
         try
@@ -33,7 +33,7 @@ public class WifiController : ControllerBase
         }
     }
 
-    [HttpPost("/review/{wifiId}")]
+    [HttpPost("review/{wifiId}")]
     public async Task<IActionResult> AddWifiReview([FromRoute] string wifiId, [FromBody] WifiReviewDto wifiReviewDto)
     {
         try
@@ -48,7 +48,7 @@ public class WifiController : ControllerBase
         }
     }
 
-    [HttpGet("/password/{wifiId}")]
+    [HttpGet("password/{wifiId}")]
     public async Task<IActionResult> GetPasswords([FromRoute] string wifiId)
     {
         try
@@ -62,7 +62,7 @@ public class WifiController : ControllerBase
         }
     }
 
-    [HttpPost("/password/{wifiId}")]
+    [HttpPost("password/{wifiId}")]
     public async Task<IActionResult> AddPassword([FromRoute] string wifiId, [FromBody] PasswordDto passwordDto)
     {
         try

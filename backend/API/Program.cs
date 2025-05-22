@@ -1,12 +1,20 @@
+using System.Text;
 using API.Data.Repositories;
 using API.Data.Repositories.Interfaces;
+using API.Domain.Models;
+using API.Helpers;
+using API.Services.Auth;
 using API.Services.Database;
+using API.Services.Interfaces.Auth;
 using API.Services.Interfaces.Map;
 using API.Services.Interfaces.User;
 using API.Services.Interfaces.Wifi;
 using API.Services.Map;
 using API.Services.User;
 using API.Services.Wifi;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.IdentityModel.Tokens;
 using MongoDB.Driver;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -29,6 +37,9 @@ builder.Services.AddScoped<IUserAuthService, UserAuthService>();
 builder.Services.AddScoped<IWifiPasswordSharingService, WifiPasswordSharingService>();
 builder.Services.AddScoped<IUserReviewService, UserReviewService>();
 builder.Services.AddScoped<IMapService, MapService>();
+builder.Services.AddScoped<IPasswordHasher<User>, PasswordHasher<User>>();
+builder.Services.AddScoped<IPasswordHelper, PasswordService>();
+builder.Services.AddScoped<IAuthenticatable, JwtService>();
 
 builder.Services.AddCors(options =>
 {
@@ -40,11 +51,31 @@ builder.Services.AddCors(options =>
     );
 });
 
+builder.Services.AddAuthentication(options =>
+{
+    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+    options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
+}).AddJwtBearer(options =>
+{
+    options.RequireHttpsMetadata = false; //should be true if pushed to production
+    options.SaveToken = true;
+    options.TokenValidationParameters = new TokenValidationParameters
+    {
+        ValidIssuer = builder.Configuration["Jwt:Issuer"],
+        ValidAudience = builder.Configuration["JwtConfig:Audience"],
+        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["JwtConfig:Key"]!)),
+        ValidateLifetime = true,
+        ValidateIssuerSigningKey = true,
+        ValidateIssuer = true,
+        ValidateAudience = true,
+    };
+});
+
 var app = builder.Build();
 
 app.UseCors("AllowFrontend");
 
-// Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
     // app.UseSwagger();
@@ -54,6 +85,7 @@ if (app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 
 app.UseAuthorization();
+app.UseAuthentication();
 
 app.MapControllers();
 
