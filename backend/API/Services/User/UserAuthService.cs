@@ -36,12 +36,12 @@ public class UserAuthService : IUserAuthService
     {
         if (string.IsNullOrEmpty(userRequestDto.Username) || string.IsNullOrEmpty(userRequestDto.Password))
         {
-            throw new ArgumentNullException(nameof(userRequestDto), "Username or password cannot be null.");
+            throw new ArgumentNullException(nameof(userRequestDto), "Username or password cannot be null or empty.");
         }
         
         if (!UserValidator.IsPasswordValid(userRequestDto.Password))
         {
-            throw new ArgumentException("Password is invalid.");
+            throw new ArgumentException("Password is invalid; must be at least 6 characters long and contain at least one uppercase letter, one lowercase letter and one number.");
         }
         
         var existingUser = await _userRepository.GetByUsernameAsync(userRequestDto.Username);
