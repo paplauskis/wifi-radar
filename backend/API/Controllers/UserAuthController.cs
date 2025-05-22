@@ -1,3 +1,4 @@
+using API.Domain;
 using API.Domain.Dto;
 using API.Services.Interfaces.User;
 using Microsoft.AspNetCore.Mvc;
@@ -23,9 +24,13 @@ public class UserAuthController : ControllerBase
             var response = await _userAuthService.HandleUserLogin(userRequestDto);
             return Ok(response);
         }
-        catch (Exception e) // specific exception handling will be implemented later
+        catch (UnauthorizedAccessException uae)
         {
-            return BadRequest(e.Message);
+            return Unauthorized(uae.Message);
+        }
+        catch (Exception e)
+        {
+            return StatusCode(500, $"Unexpected error occured: {e.Message}");
         }
     }
     
@@ -37,9 +42,21 @@ public class UserAuthController : ControllerBase
             var response = await _userAuthService.HandleUserRegistration(userRequestDto);
             return Ok(response);
         }
-        catch (Exception e) // specific exception handling will be implemented later
+        catch (UserAlreadyExistsException uaee)
         {
-            return BadRequest(e.Message);
+            return Conflict(uaee.Message);
+        }
+        catch (ArgumentNullException ane)
+        {
+            return BadRequest(ane.Message);
+        }
+        catch (ArgumentException ae)
+        {
+            return BadRequest(ae.Message);
+        }
+        catch (Exception e)
+        {
+            return StatusCode(500, $"Unexpected error occured: {e.Message}");
         }
     }
 }
