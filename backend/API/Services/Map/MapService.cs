@@ -1,17 +1,22 @@
-using API.Domain.Dto;
-using API.Domain.Models;
+using System.Text;
+using System.Text.Json;
+using API.Domain.Dto.OverpassDto;
+using API.Domain.Exceptions;
+using API.Helpers;
 using API.Services.Interfaces.Map;
 
 namespace API.Services.Map;
 
 public class MapService : IMapService
 {
-    public async Task<List<WifiNetworkDto>> Search(string city, int? radius)
+    private readonly HttpClient _client = new();
+    
+    public async Task<List<OverpassResponseElementDto>> Search(string city, int? radius)
     {
         if (string.IsNullOrEmpty(city)) 
             throw new ArgumentNullException(nameof(city), "City cannot be null or empty");
 
-        List<WifiNetworkDto> wifis;
+        List<OverpassResponseElementDto> wifis;
         
         if (radius == null)
         {
@@ -26,17 +31,44 @@ public class MapService : IMapService
             
             wifis = await SearchInRadius(city, (int)radius);
         }
+
+        if (wifis.Count == 0)
+            throw new EmptyResponseException("No wifi networks were found in the selected location.");
         
         return wifis;
     }
 
-    private async Task<List<WifiNetworkDto>> SearchInCity(string city)
+    private async Task<List<OverpassResponseElementDto>> SearchInCity(string city)
+    {
+        List<OverpassResponseElementDto> wifis = new();
+        var content = new StringContent(
+            OverpassApi.FreeWifiInCity(city), 
+            Encoding.UTF8, 
+            "application/json");
+
+        var deserializedObj = await GetResponseFromApi(content);
+
+        if (deserializedObj != null && deserializedObj.Elements != null)
+        {
+            foreach (var elem in deserializedObj.Elements)
+            {
+                wifis.Add(elem);
+            }
+        }
+        
+        return wifis;
+    }
+
+    private async Task<List<OverpassResponseElementDto>> SearchInRadius(string city, int radius)
     {
         throw new NotImplementedException();
     }
 
-    private async Task<List<WifiNetworkDto>> SearchInRadius(string city, int radius)
+    private async Task<OverpassResponseDto?> GetResponseFromApi(StringContent content)
     {
-        throw new NotImplementedException();
+        var response = await _client.PostAsync(OverpassApi.ApiUrl, content);
+        var responseString = await response.Content.ReadAsStringAsync();
+        
+        return JsonSerializer.Deserialize<OverpassResponseDto>(responseString);
     }
 }
