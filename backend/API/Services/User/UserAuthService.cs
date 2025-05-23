@@ -1,6 +1,6 @@
 using API.Data.Repositories.Interfaces;
-using API.Domain;
 using API.Domain.Dto;
+using API.Domain.Exceptions;
 using API.Helpers;
 using API.Services.Interfaces.Auth;
 using API.Services.Interfaces.User;
