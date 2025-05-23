@@ -1,4 +1,4 @@
-namespace API.Domain;
+namespace API.Domain.Exceptions;
 
 public class UserAlreadyExistsException : Exception
 {

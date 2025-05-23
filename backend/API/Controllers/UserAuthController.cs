@@ -1,5 +1,5 @@
-using API.Domain;
 using API.Domain.Dto;
+using API.Domain.Exceptions;
 using API.Services.Interfaces.User;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
