@@ -1,3 +1,4 @@
+using API.Domain.Exceptions;
 using API.Services.Interfaces.Map;
 using Microsoft.AspNetCore.Mvc;
 
@@ -19,12 +20,24 @@ public class MapController : ControllerBase
     {
         try
         {
-            var wifis = await _mapService.Search(city, radius); 
+            var wifis = await _mapService.Search(city, radius);
             return Ok(wifis);
         }
-        catch (Exception e) // specific exception handling will be implemented later
+        catch (ArgumentNullException ane)
         {
-            return BadRequest(e.Message);
+            return BadRequest(ane.Message);
+        }
+        catch (ArgumentException ae)
+        {
+            return BadRequest(ae.Message);
+        }
+        catch (EmptyResponseException)
+        {
+            return NoContent();
+        }
+        catch (Exception e)
+        {
+            return StatusCode(500, $"Unexpected error occured: {e.Message}");
         }
     }
 }
