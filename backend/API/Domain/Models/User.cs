@@ -25,6 +25,9 @@ namespace API.Domain.Models
         [BsonElement("Password")]
         public string Password { get; set; }
 
+        [BsonElement("FavoriteNetworkId")]
+        public List<string> FavoriteNetworkId { get; set; } = new();
+
         public User() { }
 
         public User(string username, string password)
