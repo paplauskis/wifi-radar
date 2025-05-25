@@ -1,20 +1,29 @@
-using API.Data.Repositories.Interfaces; 
+using API.Data.Repositories.Interfaces;
+using API.Domain;
 using API.Services.Interfaces.Wifi;
 using API.Domain.Models;
+using API.Domain.Dto;
 
 namespace API.Services.Wifi;
 
 public class WifiSearchService : IWifiSearchService
 {
     private readonly IWifiRepository _wifiRepository;
-    
-    public WifiSearchService(IWifiRepository repo)
+    private readonly IWifiReviewRepository _wifiReviewRepository;
+
+    public WifiSearchService(IWifiRepository repo, IWifiReviewRepository wifiReviewRepository)
     {
         _wifiRepository = repo;
+        _wifiReviewRepository = wifiReviewRepository;
     }
 
-    public async Task<List<WifiNetwork>> GetWifi(string city)
+    public Task<List<WifiReview>> GetReviewsAsync(string wifiId)
     {
-        return await _wifiRepository.GetByCityAsync(city);
+        throw new NotImplementedException();
+    }
+
+    public Task<WifiReview> AddReviewAsync(WifiReviewDto wifiReviewDto)
+    {
+        throw new NotImplementedException();
     }
 }
