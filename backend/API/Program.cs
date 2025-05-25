@@ -10,7 +10,7 @@ using API.Services.Interfaces.Map;
 using API.Services.Interfaces.User;
 using API.Services.Interfaces.Wifi;
 using API.Services.Map;
-using API.Services.User;
+using API.Services.Users;
 using API.Services.Wifi;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
@@ -78,8 +78,8 @@ app.UseCors("AllowFrontend");
 
 if (app.Environment.IsDevelopment())
 {
-    // app.UseSwagger();
-    // app.UseSwaggerUI();
+     app.UseSwagger();
+     app.UseSwaggerUI();
 }
 
 app.UseHttpsRedirection();
