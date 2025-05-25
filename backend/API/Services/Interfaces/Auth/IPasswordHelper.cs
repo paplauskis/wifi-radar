@@ -1,5 +1,3 @@
-
-
 namespace API.Services.Interfaces.Auth;
 
 public interface IPasswordHelper

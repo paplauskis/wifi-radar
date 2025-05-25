@@ -1,6 +1,10 @@
-namespace API.Services.Interfaces.User;
+using API.Domain.Models;
 
-public interface IUserReviewService
+namespace API.Services.Interfaces.User
 {
-    
+    public interface IUserReviewService
+    {
+        Task AddReviewAsync(WifiReview review);
+        Task<List<WifiReview>> GetReviewAsync(string wifiId);
+    }
 }
