@@ -1,4 +1,5 @@
 using API.Data.Repositories.Interfaces;
+using API.Domain;
 using API.Services.Interfaces.Wifi;
 
 namespace API.Services.Wifi;
@@ -10,6 +11,16 @@ public class WifiPasswordSharingService : IWifiPasswordSharingService
     public WifiPasswordSharingService(IWifiRepository wifiRepository)
     {
         _wifiRepository = wifiRepository;
+    }
+
+    public Task<string> AddPasswordAsync(PasswordDto passwordDto)
+    {
+        throw new NotImplementedException();
+    }
+
+    public Task<List<string>> GetPasswordsAsync(string wifiId)
+    {
+        throw new NotImplementedException();
     }
 
     public async Task SharePasswordAsync(string wifiNetworkId, string password)
