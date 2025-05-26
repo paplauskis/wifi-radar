@@ -46,7 +46,7 @@ public class MapService : IMapService
             Encoding.UTF8, 
             "application/json");
 
-        var deserializedObj = await GetResponseFromApi(content);
+        var deserializedObj = await PostResponseOverpassApi(content);
 
         if (deserializedObj != null && deserializedObj.Elements != null)
         {
@@ -61,14 +61,51 @@ public class MapService : IMapService
 
     private async Task<List<OverpassResponseElementDto>> SearchInRadius(string city, int radius)
     {
-        throw new NotImplementedException();
+        var coordinateDto = await GetCityCenterPoint(city);
+        
+        if (coordinateDto == null)
+            throw new ArgumentNullException(nameof(coordinateDto), "City center point cannot be null; check city name and try again.");
+        
+        List<OverpassResponseElementDto> wifis = new();
+        var content = new StringContent(
+            OverpassApi.FreeWifiInRadius(radius, coordinateDto.Latitude, coordinateDto.Longitude), 
+            Encoding.UTF8, 
+            "application/json");
+        
+        var deserializedObj = await PostResponseOverpassApi(content);
+
+        if (deserializedObj != null && deserializedObj.Elements != null)
+        {
+            foreach (var elem in deserializedObj.Elements)
+            {
+                wifis.Add(elem);
+            }
+        }
+        
+        return wifis;
     }
 
-    private async Task<OverpassResponseDto?> GetResponseFromApi(StringContent content)
+    private async Task<OverpassResponseDto?> PostResponseOverpassApi(StringContent content)
     {
         var response = await _client.PostAsync(OverpassApi.ApiUrl, content);
         var responseString = await response.Content.ReadAsStringAsync();
         
         return JsonSerializer.Deserialize<OverpassResponseDto>(responseString);
+    }
+
+    private async Task<CoordinateDto?> GetCityCenterPoint(string city)
+    {
+        _client.DefaultRequestHeaders.UserAgent.ParseAdd("user_agent"); //user agent is needed to access openstreetmap api
+        var response = await _client.GetAsync(OpenstreetmapApi.CityCenterPoint(city));
+        var responseString = await response.Content.ReadAsStringAsync();
+        
+        var dto = JsonSerializer.Deserialize<List<CoordinateDto>>(responseString);
+
+        if (dto == null || dto.Count == 0)
+        {
+            return null;
+        }
+        
+        return dto.First();
     }
 }

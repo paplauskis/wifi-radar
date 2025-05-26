@@ -12,4 +12,13 @@ public static class OverpassApi
                $"[\"addr:city\"=\"{city}\"];\n" +
                $"out body;";
     }
+
+    public static string FreeWifiInRadius(int radius, string? lat, string? lon)
+    {
+        return $"[out:json];\nnode\n  " +
+               $"[\"internet_access\"=\"wlan\"]\n  " +
+               $"[\"internet_access:fee\"=\"no\"]\n  " +
+               $"(around:{radius},{lat},{lon});" +
+               $"out body;";
+    }
 }
