@@ -3,7 +3,7 @@ using API.Domain.Models;
 
 namespace API.Services.Interfaces.Wifi;
 
-public interface IWifiSearchService
+public interface IWifiReviewService
 {
     Task<List<WifiReview>> GetReviewsAsync(string wifiId);
     Task<WifiReview> AddReviewAsync(WifiReviewDto wifiReviewDto);

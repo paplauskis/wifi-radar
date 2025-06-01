@@ -5,7 +5,7 @@ using API.Domain.Models;
 
 namespace API.Services.Wifi;
 
-public class WifiReviewService : IWifiSearchService
+public class WifiReviewService : IWifiReviewService
 {
     private readonly IWifiRepository _wifiRepository;
     private readonly IWifiReviewRepository _wifiReviewRepository;
