@@ -10,10 +10,10 @@ using Microsoft.AspNetCore.Mvc;
 [Route("/api/wifi")]
 public class WifiController : ControllerBase
 {
-    private readonly IWifiSearchService _wifiSearchService;
+    private readonly IWifiReviewService _wifiSearchService;
     private readonly IWifiPasswordSharingService _wifiPasswordSharingService;
     
-    public WifiController(IWifiSearchService wifiSearchService, IWifiPasswordSharingService wifiPasswordSharingService)
+    public WifiController(IWifiReviewService wifiSearchService, IWifiPasswordSharingService wifiPasswordSharingService)
     {
         _wifiSearchService = wifiSearchService;
         _wifiPasswordSharingService = wifiPasswordSharingService;

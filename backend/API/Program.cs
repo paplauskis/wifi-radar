@@ -31,7 +31,7 @@ builder.Services.AddSingleton<IMongoDatabase>(sp =>
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IWifiRepository, WifiRepository>();
 builder.Services.AddScoped<IWifiReviewRepository, WifiReviewRepository>();
-builder.Services.AddScoped<IWifiSearchService, WifiSearchService>();
+builder.Services.AddScoped<IWifiReviewService, WifiReviewService>();
 builder.Services.AddScoped<IUserFavoriteService, UserFavoriteService>();
 builder.Services.AddScoped<IUserAuthService, UserAuthService>();
 builder.Services.AddScoped<IWifiPasswordSharingService, WifiPasswordSharingService>();
