@@ -41,4 +41,23 @@ public class MapControllerTests
         
         Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
     }
+    
+    [Theory]
+    [InlineData("Vilnius", -120)]
+    [InlineData("Vilnius", -1)]
+    [InlineData("Vilnius", 100001)]
+    [InlineData("Vilnius", 560293)]
+    [InlineData("Vilnius", int.MaxValue)]
+    [InlineData("Vilnius", int.MinValue)]
+    public async Task Search_WithInvalidRadius_ReturnsBadRequest(string city, int radius)
+    {
+        await using var factory = new ApiWebApplicationFactory();
+        var client = factory.CreateClient();
+        
+        var response = await client.GetAsync($"api/map/search?city={city}&radius={radius}");
+        var responseText = await response.Content.ReadAsStringAsync();
+        
+        Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+        Assert.Contains($"Radius cannot be", responseText);
+    }
 }
