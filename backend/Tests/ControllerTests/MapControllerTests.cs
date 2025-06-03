@@ -1,7 +1,4 @@
 using System.Net;
-using System.Net.Http.Json;
-using API.Domain.Dto;
-using API.Domain.Dto.OverpassDto;
 using Xunit;
 
 namespace Tests.ControllerTests;
@@ -32,7 +29,7 @@ public class MapControllerTests
     [InlineData(null)]
     [InlineData("")]
     [InlineData(" ")]
-    public async Task Search_WithInvalidCity_ReturnsBadRequest(string city)
+    public async Task Search_WithInvalidCity_ReturnsBadRequest(string? city)
     {
         await using var factory = new ApiWebApplicationFactory();
         var client = factory.CreateClient();
@@ -76,5 +73,25 @@ public class MapControllerTests
         
         Assert.Equal(HttpStatusCode.NoContent, response.StatusCode);
         Assert.Empty(responseText);
+    }
+    
+    [Theory]
+    [InlineData("Vilnius", 500)]
+    [InlineData("Kaunas", 100000)]
+    [InlineData("Miami", 4563)]
+    [InlineData("Berlin", 1234)]
+    [InlineData("Madrid", 6733)]
+    [InlineData("Warsaw", 99999)]
+    public async Task Search_WithValidCityAndRadius_ReturnsOk(string city, int radius)
+    {
+        await using var factory = new ApiWebApplicationFactory();
+        var client = factory.CreateClient();
+        
+        var response = await client.GetAsync($"api/map/search?city={city}&radius={radius}");
+        var result = await response.Content.ReadAsStringAsync();
+
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+        Assert.NotNull(result);
+        Assert.NotEmpty(result);
     }
 }
