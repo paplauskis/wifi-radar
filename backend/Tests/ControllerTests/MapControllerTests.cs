@@ -27,5 +27,18 @@ public class MapControllerTests
         Assert.NotNull(result);
         Assert.NotEmpty(result);
     }
-    
+
+    [Theory]
+    [InlineData(null)]
+    [InlineData("")]
+    [InlineData(" ")]
+    public async Task Search_WithInvalidCity_ReturnsBadRequest(string city)
+    {
+        await using var factory = new ApiWebApplicationFactory();
+        var client = factory.CreateClient();
+        
+        var response = await client.GetAsync($"api/map/search?city={city}");
+        
+        Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+    }
 }
