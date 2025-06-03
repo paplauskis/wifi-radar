@@ -60,4 +60,21 @@ public class MapControllerTests
         Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
         Assert.Contains($"Radius cannot be", responseText);
     }
+    
+    [Theory]
+    [InlineData("wfenolfwjnkmr")]
+    [InlineData("citynamecityname")]
+    [InlineData("Poland")]
+    [InlineData("Germany")]
+    public async Task Search_WithNonexistentCity_ReturnsNoContent(string city)
+    {
+        await using var factory = new ApiWebApplicationFactory();
+        var client = factory.CreateClient();
+        
+        var response = await client.GetAsync($"api/map/search?city={city}");
+        var responseText = await response.Content.ReadAsStringAsync();
+        
+        Assert.Equal(HttpStatusCode.NoContent, response.StatusCode);
+        Assert.Empty(responseText);
+    }
 }
