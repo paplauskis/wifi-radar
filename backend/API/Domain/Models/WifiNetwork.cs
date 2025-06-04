@@ -25,22 +25,6 @@ public class WifiNetwork : TimeStampedEntity
         }
     }
 
-    private string _country;
-
-    [BsonElement("Country")]
-    public string Country
-    {
-        get => _country;
-        set
-        {
-            if(string.IsNullOrWhiteSpace(value))
-            {
-                throw new ArgumentException($"Country cannot be set to {value}.");
-            }
-            _country = value;
-        }
-    }
-
     private string _city;
     [BsonElement("City")]
     public string City
