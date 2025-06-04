@@ -60,4 +60,23 @@ public class UserAuthControllerTests
         Assert.NotEmpty(result.AccessToken);
         Assert.True(result.ExpiresIn > 0);
     }
+
+    [Fact]
+    public async Task Register_WithExistingUsername_ReturnsConflict()
+    {
+        await using var factory = new ApiWebApplicationFactory();
+        var client = factory.CreateClient();
+
+        var user = new UserLoginRequestDto { Username = "thisismyusername", Password = "PASSword123" };
+        var json = JsonConvert.SerializeObject(user);
+        var content = new StringContent(json, Encoding.UTF8, "application/json");
+        
+        var firstResponse = await client.PostAsync($"{ApiUri}register", content);
+        var secondResponse = await client.PostAsync($"{ApiUri}register", content);
+        var result = await secondResponse.Content.ReadAsStringAsync();
+        
+        Assert.Equal(HttpStatusCode.OK, firstResponse.StatusCode);
+        Assert.Contains(user.Username, result);
+        Assert.Equal(HttpStatusCode.Conflict, secondResponse.StatusCode);
+    }
 }
