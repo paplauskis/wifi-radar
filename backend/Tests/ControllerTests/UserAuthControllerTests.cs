@@ -1,4 +1,5 @@
 using System.Net;
+using System.Net.Http.Json;
 using System.Text;
 using API.Domain.Dto;
 using Newtonsoft.Json;
@@ -34,5 +35,29 @@ public class UserAuthControllerTests
         Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
         Assert.NotNull(result);
         Assert.NotEmpty(result);
+    }
+
+    [Theory]
+    [InlineData("jake", "Jake88")]
+    [InlineData("vooDOO", "Password123")]
+    [InlineData("Irisas", "QWERTY451yao")]
+    [InlineData("dzojus", "VeryGoodPassword987123405")]
+    public async Task Register_WithValidCredentials_ReturnsOk(string username, string password)
+    {
+        await using var factory = new ApiWebApplicationFactory();
+        var client = factory.CreateClient();
+
+        var user = new UserLoginRequestDto { Username = username, Password = password };
+        var json = JsonConvert.SerializeObject(user);
+        var content = new StringContent(json, Encoding.UTF8, "application/json");
+        var response = await client.PostAsync($"{ApiUri}register", content);
+        var result = await response.Content.ReadFromJsonAsync<UserLoginResponseDto>();
+
+        Assert.NotNull(result);
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+        Assert.Equal(result.Username, user.Username);
+        Assert.NotNull(result.AccessToken);
+        Assert.NotEmpty(result.AccessToken);
+        Assert.True(result.ExpiresIn > 0);
     }
 }
