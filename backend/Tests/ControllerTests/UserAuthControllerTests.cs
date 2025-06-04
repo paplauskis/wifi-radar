@@ -102,4 +102,23 @@ public class UserAuthControllerTests
         Assert.NotEmpty(result);
         Assert.Contains(user.Username, result);
     }
+
+    [Theory]
+    [InlineData("invalid_username", "randompassword123")]
+    [InlineData("nonexistentusername", "nonexistentpassword")]
+    [InlineData("lol", "123")]
+    [InlineData("user321", "Word2")]
+    public async Task Login_WithInvalidCredentials_ReturnsUnauthorized(string? username, string? password)
+    {
+        await using var factory = new ApiWebApplicationFactory();
+        var client = factory.CreateClient();
+
+        var user = new UserLoginRequestDto { Username = username, Password = password };
+        var json = JsonConvert.SerializeObject(user);
+        var content = new StringContent(json, Encoding.UTF8, "application/json");
+        
+        var login = await client.PostAsync($"{ApiUri}login", content);
+        
+        Assert.Equal(HttpStatusCode.Unauthorized, login.StatusCode);
+    }
 }
