@@ -15,7 +15,7 @@ public class UserFavoriteController : ControllerBase
         _userFavoriteService = userFavoriteService;
     }
 
-    [HttpGet("favorites/{userId}")]
+    [HttpGet("{userId}/favorites")]
     public async Task<IActionResult> GetFavorites([FromRoute] string userId)
     {
         try
@@ -29,7 +29,7 @@ public class UserFavoriteController : ControllerBase
         }
     }
 
-    [HttpPost("favorites/{userId}")]
+    [HttpPost("{userId}/favorites")]
     public async Task<IActionResult> AddFavorite([FromRoute] string userId, [FromBody] WifiNetwork wifi)
     {
         try
@@ -43,7 +43,7 @@ public class UserFavoriteController : ControllerBase
         }
     }
 
-    [HttpDelete("favorites/{userId}")]
+    [HttpDelete("{userId}/favorites")]
     public async Task<IActionResult> DeleteFavorite([FromRoute] string userId, [FromBody] string wifiId)
     {
         try
