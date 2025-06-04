@@ -79,4 +79,27 @@ public class UserAuthControllerTests
         Assert.Contains(user.Username, result);
         Assert.Equal(HttpStatusCode.Conflict, secondResponse.StatusCode);
     }
+
+    [Theory]
+    [InlineData("jake", "Jake88")]
+    [InlineData("vooDOO", "Password123")]
+    [InlineData("Irisas", "QWERTY451yao")]
+    [InlineData("dzojus", "VeryGoodPassword987123405")]
+    public async Task Login_WithValidCredentials_ReturnsOk(string username, string password)
+    {
+        await using var factory = new ApiWebApplicationFactory();
+        var client = factory.CreateClient();
+
+        var user = new UserLoginRequestDto { Username = username, Password = password };
+        var json = JsonConvert.SerializeObject(user);
+        var content = new StringContent(json, Encoding.UTF8, "application/json");
+        
+        await client.PostAsync($"{ApiUri}register", content);
+        var login = await client.PostAsync($"{ApiUri}login", content);
+        var result = await login.Content.ReadAsStringAsync();
+        
+        Assert.Equal(HttpStatusCode.OK, login.StatusCode);
+        Assert.NotEmpty(result);
+        Assert.Contains(user.Username, result);
+    }
 }
