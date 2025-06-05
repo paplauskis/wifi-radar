@@ -170,6 +170,37 @@ public class UserFavoriteControllerTests
         
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
     }
+
+    [Fact]
+    public async Task DeleteFavorite_ShouldDeleteWifiNetwork_ReturnOk()
+    {
+        await using var factory = new ApiWebApplicationFactory();
+        var client = factory.CreateClient();
+        var user = await CreateSampleUser(client);
+        var wifiNetwork = WifiNetworkDtoHelper.GetValidWifiNetworkDto(user);
+        
+        // save wifi network to favorites
+        var addFavoriteContent = new StringContent(JsonConvert.SerializeObject(wifiNetwork), Encoding.UTF8, "application/json");
+        var addFavoriteResponse = await client.PostAsync($"{ApiUri}/{user.Id}/favorites", addFavoriteContent);
+        
+        // retrieve favorite wifi networks (should be 1)
+        var getFavoritesResponse = await client.GetAsync($"{ApiUri}/{user.Id}/favorites");
+        var getFavoritesResult = await getFavoritesResponse.Content.ReadFromJsonAsync<List<WifiNetworkDto>>();
+        
+        // delete the wifi network that was saved to favorites
+        var deleteFavoriteResponse = await client.DeleteAsync($"{ApiUri}/{user.Id}/favorites/{wifiNetwork.WifiId}");
+        
+        // retrieve favorite wifi networks (should be 0)
+        var getFavoritesResponse2 = await client.GetAsync($"{ApiUri}/{user.Id}/favorites");
+        var getFavoritesResult2 = await getFavoritesResponse2.Content.ReadFromJsonAsync<List<WifiNetworkDto>>();
+
+        Assert.Equal(HttpStatusCode.OK, addFavoriteResponse.StatusCode);
+        Assert.NotNull(getFavoritesResult);
+        Assert.Single(getFavoritesResult);
+        Assert.Equal(HttpStatusCode.OK, deleteFavoriteResponse.StatusCode);
+        Assert.NotNull(getFavoritesResult2);
+        Assert.Empty(getFavoritesResult2);
+    }
     
     private async Task<UserLoginResponseDto> CreateSampleUser(HttpClient client)
     {
