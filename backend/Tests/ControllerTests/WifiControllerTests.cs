@@ -125,19 +125,19 @@ public class WifiControllerTests
         var user = await CreateSampleUser(client);
         var passwordDto = new PasswordDto { Password = "very_secret_password", UserId = user.Id };
         
-        var getPasswordsContent = new StringContent(JsonConvert.SerializeObject(passwordDto), Encoding.UTF8, "application/json");
-        var getPasswordsResponse = await client.PostAsync($"{ApiUri}/{wifiId}/password", getPasswordsContent);
-        var getPasswordsResult = await getPasswordsResponse.Content.ReadAsStringAsync();
+        var addPasswordContent = new StringContent(JsonConvert.SerializeObject(passwordDto), Encoding.UTF8, "application/json");
+        var addPasswordResponse = await client.PostAsync($"{ApiUri}/{wifiId}/password", addPasswordContent);
+        var addPasswordResult = await addPasswordResponse.Content.ReadAsStringAsync();
         
-        Assert.Equal(HttpStatusCode.BadRequest, getPasswordsResponse.StatusCode);
-        Assert.Equal($"Invalid wifi id: \"{wifiId}\"", getPasswordsResult);
+        Assert.Equal(HttpStatusCode.BadRequest, addPasswordResponse.StatusCode);
+        Assert.Equal($"Invalid wifi id: \"{wifiId}\"", addPasswordResult);
     }
-
+    
     [Theory]
-    [InlineData("very_secret_password")]
-    [InlineData("3y791tv04n")]
-    [InlineData("DONOTCONNECT")]
-    public async Task AddPassword_WithValidWifiIdAndPassword_ShouldReturnOk(string password)
+    [InlineData(null)]
+    [InlineData(" ")]
+    [InlineData("vnthuq0vqthun09v0qtuhnrv0qtunrhm9vmqtrvmrtghu9vthunm90rwtvwhnm89247t2vn0hmnw6urnw6unw6u2wu4bni5m213muf")]
+    public async Task AddPassword_WithInvalidPassword_ShouldReturnBadRequest(string? password)
     {
         await using var factory = new ApiWebApplicationFactory();
         var client = factory.CreateClient();
@@ -147,13 +147,10 @@ public class WifiControllerTests
         
         var addPasswordContent = new StringContent(JsonConvert.SerializeObject(passwordDto), Encoding.UTF8, "application/json");
         var addPasswordResponse = await client.PostAsync($"{ApiUri}/{wifiNetworkDto.WifiId}/password", addPasswordContent);
-       
-        Assert.Equal(HttpStatusCode.OK, addPasswordResponse.StatusCode);
-        
         var addPasswordResult = await addPasswordResponse.Content.ReadAsStringAsync();
         
-        Assert.NotNull(addPasswordResult);
-        Assert.Equal(passwordDto.Password, addPasswordResult);
+        Assert.Equal(HttpStatusCode.BadRequest, addPasswordResponse.StatusCode);
+        Assert.Equal($"Invalid password: \"{passwordDto.Password}\"", addPasswordResult);
     }
     
     [Theory]
