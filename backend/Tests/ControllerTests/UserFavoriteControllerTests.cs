@@ -4,6 +4,7 @@ using System.Text;
 using API.Domain.Dto;
 using MongoDB.Bson;
 using Newtonsoft.Json;
+using Tests.Helpers;
 using Xunit;
 
 namespace Tests.ControllerTests;
@@ -40,6 +41,24 @@ public class UserFavoriteControllerTests
         Assert.Contains(wifiNetwork.Name, addFavoriteResult);
         Assert.Contains(wifiNetwork.Street, addFavoriteResult);
         Assert.Contains(wifiNetwork.BuildingNumber.ToString()!, addFavoriteResult);
+    }
+
+    [Theory]
+    [MemberData(nameof(WifiNetworkDtoHelper.InvalidWifiNetworkDtos), MemberType = typeof(WifiNetworkDtoHelper))]
+    public async Task AddFavorite_WithInvalidDtoData_ShouldReturnBadRequest(WifiNetworkDto wifiNetwork)
+    {
+        await using var factory = new ApiWebApplicationFactory();
+        var client = factory.CreateClient();
+        
+        var user = await CreateSampleUser(client);
+        wifiNetwork.UserId = user.Id!;
+        
+        var addFavoriteContent = new StringContent(JsonConvert.SerializeObject(wifiNetwork), Encoding.UTF8, "application/json");
+        var addFavoriteResponse = await client.PostAsync($"{ApiUri}/{user.Id}/favorites", addFavoriteContent);
+        var addFavoriteResult = await addFavoriteResponse.Content.ReadAsStringAsync();
+        
+        Assert.Equal(HttpStatusCode.BadRequest, addFavoriteResponse.StatusCode);
+        Assert.Equal($"WifiNetworkDto parameter data is not valid", addFavoriteResult);
     }
 
     private async Task<UserLoginResponseDto> CreateSampleUser(HttpClient client)
