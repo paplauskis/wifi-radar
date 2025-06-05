@@ -89,6 +89,32 @@ public class UserFavoriteControllerTests
         Assert.Equal($"User ID \"{invalidUserId}\" is not valid", addFavoriteResult);
     }
     
+    [Fact]
+    public async Task AddFavorite_WithDuplicateWifiNetwork_ShouldReturnConflict()
+    {
+        await using var factory = new ApiWebApplicationFactory();
+        var client = factory.CreateClient();
+        
+        var user = await CreateSampleUser(client);
+        var wifiNetwork = new WifiNetworkDto
+        {
+            WifiId = ObjectId.GenerateNewId().ToString(),
+            UserId = user.Id!,
+            City = "Kaunas",
+            Name = "City Hotels Algirdas",
+            Street = "Algirdo g.",
+            BuildingNumber = 24,
+            IsFree = true
+        };
+        var addFavoriteContent = new StringContent(JsonConvert.SerializeObject(wifiNetwork), Encoding.UTF8, "application/json");
+        await client.PostAsync($"{ApiUri}/{user.Id}/favorites", addFavoriteContent);
+        var addFavoriteResponse = await client.PostAsync($"{ApiUri}/{user.Id}/favorites", addFavoriteContent);
+        var addFavoriteResult = await addFavoriteResponse.Content.ReadAsStringAsync();
+    
+        Assert.Equal(HttpStatusCode.Conflict, addFavoriteResponse.StatusCode);
+        Assert.Equal("The same wifi network already is saved by this user", addFavoriteResult);
+    }
+    
     private async Task<UserLoginResponseDto> CreateSampleUser(HttpClient client)
     {
         var user = new UserLoginRequestDto { Username = "sampleUser", Password = "randomPassword123" };
