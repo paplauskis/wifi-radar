@@ -1,4 +1,6 @@
+using API.Domain.Dto;
 using API.Domain.Models;
+using API.Helpers.Mappers;
 using API.Services.Interfaces.User;
 using MongoDB.Driver;
 
@@ -15,27 +17,35 @@ namespace API.Services.Users
             _wifiNetworks = database.GetCollection<WifiNetwork>("Favorite-WiFi-Spots");
         }
 
-        public async Task<List<WifiNetwork>> GetUserFavoritesAsync(string username)
+        public async Task<List<WifiNetworkDto>> GetUserFavoritesAsync(string username)
         {
             var ids = await GetFavoriteNetworkIdsAsync(username);
-            if (ids == null || !ids.Any()) return new List<WifiNetwork>();
+            if (ids == null || !ids.Any()) return new List<WifiNetworkDto>();
 
             var filter = Builders<WifiNetwork>.Filter.In(w => w.Id, ids);
-            return await _wifiNetworks.Find(filter).ToListAsync();
+            var wifiNetworkList = await _wifiNetworks.Find(filter).ToListAsync();
+
+            var dtoList = new List<WifiNetworkDto>();
+            foreach (var wifiNetwork in wifiNetworkList)
+            {
+                dtoList.Add(Mapper.MapWifiNetworkToDto(wifiNetwork));
+            }
+            
+            return dtoList;
         }
 
-        public async Task<WifiNetwork> AddUserFavoriteAsync(string username, WifiNetwork wifi)
+        public async Task<WifiNetworkDto> AddUserFavoriteAsync(string username, WifiNetworkDto wifi)
         {
             var filter = Builders<User>.Filter.Eq(u => u.Username, username);
-            var update = Builders<User>.Update.AddToSet(u => u.FavoriteNetworkId, wifi.Id);
+            var update = Builders<User>.Update.AddToSet(u => u.FavoriteNetworkId, wifi.WifiId);
 
             await _users.UpdateOneAsync(filter, update);
 
             
-            var existing = await _wifiNetworks.Find(w => w.Id == wifi.Id).FirstOrDefaultAsync();
+            var existing = await _wifiNetworks.Find(w => w.Id == wifi.WifiId).FirstOrDefaultAsync();
             if (existing == null)
             {
-                await _wifiNetworks.InsertOneAsync(wifi);
+                await _wifiNetworks.InsertOneAsync(Mapper.MapDtoToWifiNetwork(wifi));
             }
 
             return wifi;

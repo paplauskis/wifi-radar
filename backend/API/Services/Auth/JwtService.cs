@@ -37,7 +37,8 @@ public class JwtService : IAuthenticatable
         {
             Subject = new ClaimsIdentity(new[]
             {
-                new Claim(JwtRegisteredClaimNames.Name, user.Username)
+                new Claim(JwtRegisteredClaimNames.Name, user.Username),
+                new Claim(ClaimTypes.NameIdentifier, user.Id.ToString())
             }),
             Expires = tokenExpiryDate,
             Issuer = issuer,
@@ -52,6 +53,7 @@ public class JwtService : IAuthenticatable
 
         return new UserLoginResponseDto
         {
+            Id = user.Id,
             Username = user.Username,
             AccessToken = accessToken,
             ExpiresIn = (int)tokenExpiryDate.Subtract(DateTime.UtcNow).TotalSeconds

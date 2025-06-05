@@ -25,22 +25,6 @@ public class WifiNetwork : TimeStampedEntity
         }
     }
 
-    private string _country;
-
-    [BsonElement("Country")]
-    public string Country
-    {
-        get => _country;
-        set
-        {
-            if(string.IsNullOrWhiteSpace(value))
-            {
-                throw new ArgumentException($"Country cannot be set to {value}.");
-            }
-            _country = value;
-        }
-    }
-
     private string _city;
     [BsonElement("City")]
     public string City
@@ -116,11 +100,17 @@ public class WifiNetwork : TimeStampedEntity
         get => _postalCode;
         set
         {
-            if (value.HasValue && (value <= 0 || value > 99999))
+            if (value.HasValue)
             {
-                throw new ArgumentException($"PostalCode cannot be set to {value}");
+                if (value <= 0 || value > 99999)
+                    throw new ArgumentException($"PostalCode cannot be set to {value}");
+
+                _postalCode = value.Value;
             }
-            _postalCode = (int)value;
+            else
+            {
+                _postalCode = default;
+            }
         }
     }
 

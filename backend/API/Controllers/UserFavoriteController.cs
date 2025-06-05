@@ -1,4 +1,5 @@
-using API.Domain.Models;
+using API.Domain.Dto;
+using API.Helpers.Mappers;
 using API.Services.Interfaces.User;
 using Microsoft.AspNetCore.Mvc;
 
@@ -15,7 +16,7 @@ public class UserFavoriteController : ControllerBase
         _userFavoriteService = userFavoriteService;
     }
 
-    [HttpGet("favorites/{userId}")]
+    [HttpGet("{userId}/favorites")]
     public async Task<IActionResult> GetFavorites([FromRoute] string userId)
     {
         try
@@ -29,12 +30,12 @@ public class UserFavoriteController : ControllerBase
         }
     }
 
-    [HttpPost("favorites/{userId}")]
-    public async Task<IActionResult> AddFavorite([FromRoute] string userId, [FromBody] WifiNetwork wifi)
+    [HttpPost("{userId}/favorites")]
+    public async Task<IActionResult> AddFavorite([FromRoute] string userId, [FromBody] WifiNetworkDto dto)
     {
         try
-        { 
-            var addedFavorite = await _userFavoriteService.AddUserFavoriteAsync(userId, wifi);
+        {
+            var addedFavorite = await _userFavoriteService.AddUserFavoriteAsync(userId, dto);
             return Ok(addedFavorite);
         }
         catch (Exception e) // specific exception handling will be implemented later
@@ -43,8 +44,8 @@ public class UserFavoriteController : ControllerBase
         }
     }
 
-    [HttpDelete("favorites/{userId}")]
-    public async Task<IActionResult> DeleteFavorite([FromRoute] string userId, [FromBody] string wifiId)
+    [HttpDelete("{userId}/favorites/{wifiId}")]
+    public async Task<IActionResult> DeleteFavorite([FromRoute] string userId, [FromRoute] string wifiId)
     {
         try
         { 
