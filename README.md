@@ -9,9 +9,9 @@
 
 - GET api/map/search?city={value}
 - GET api/map/search?city={value}&radius={value}
-- POST api/user/favorites/{userId} (wifi object)
-- GET api/user/favorites/{userId}
-- DELETE api/user/favorites/{userId} (wifi id)
+- POST api/user/{userId}/favorites (wifi object)
+- GET api/user/{userId}/favorites
+- DELETE api/user/{userId}/favorites/{wifiId}
 - POST api/wifi/review/{wifiId} (per body perduot user, comment, rating)
 - GET api/wifi/review/{wifiId}
 - POST /api/wifi/password/{wifiId} (body - password, userId)
