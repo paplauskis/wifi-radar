@@ -61,6 +61,34 @@ public class UserFavoriteControllerTests
         Assert.Equal($"WifiNetworkDto parameter data is not valid", addFavoriteResult);
     }
 
+    [Theory]
+    [InlineData("invalidUserId")]
+    [InlineData("71cthn8049")]
+    [InlineData("id")]
+    public async Task AddFavorite_WithInvalidUserId_ShouldReturnNotFound(string? invalidUserId)
+    {
+        await using var factory = new ApiWebApplicationFactory();
+        var client = factory.CreateClient();
+        
+        var user = await CreateSampleUser(client);
+        var wifiNetwork = new WifiNetworkDto
+        {
+            WifiId = ObjectId.GenerateNewId().ToString(),
+            UserId = user.Id!,
+            City = "Kaunas",
+            Name = "City Hotels Algirdas",
+            Street = "Algirdo g.",
+            BuildingNumber = 24,
+            IsFree = true
+        };
+        var addFavoriteContent = new StringContent(JsonConvert.SerializeObject(wifiNetwork), Encoding.UTF8, "application/json");
+        var addFavoriteResponse = await client.PostAsync($"{ApiUri}/{invalidUserId}/favorites", addFavoriteContent);
+        var addFavoriteResult = await addFavoriteResponse.Content.ReadAsStringAsync();
+        
+        Assert.Equal(HttpStatusCode.NotFound, addFavoriteResponse.StatusCode);
+        Assert.Equal($"User ID \"{invalidUserId}\" is not valid", addFavoriteResult);
+    }
+    
     private async Task<UserLoginResponseDto> CreateSampleUser(HttpClient client)
     {
         var user = new UserLoginRequestDto { Username = "sampleUser", Password = "randomPassword123" };
