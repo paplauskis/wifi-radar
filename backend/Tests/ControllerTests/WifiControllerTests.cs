@@ -70,6 +70,7 @@ public class WifiControllerTests
         Assert.Equal("Invalid wifi id", getWifiReviewResult);
     }
 
+    //ensure AddWifiReview works first
     [Fact]
     public async Task GetWifiReviews_WhenReviewsExist_ShouldReturnOk()
     {
@@ -97,6 +98,20 @@ public class WifiControllerTests
         Assert.Equal(sampleWifiReview.WifiId, addWifiReviewResult.WifiId);
         Assert.Equal(sampleWifiReview.Text, addWifiReviewResult.Text);
         Assert.Equal(sampleWifiReview.Rating, addWifiReviewResult.Rating);
+    }
+
+    [Fact]
+    public async Task GetWifiReviews_WhenReviewsDontExist_ShouldReturnNoContent()
+    {
+        await using var factory = new ApiWebApplicationFactory();
+        var client = factory.CreateClient();
+        await CreateSampleUser(client);
+        var sampleWifiReview = (WifiReviewDto)WifiReviewDtoHelper.ValidWifiReviewDtos().ToList()[0][0];
+        var wifiId = sampleWifiReview.WifiId ?? throw new Exception("Wifi id is null");
+        
+        var getWifiReviewResponse = await client.GetAsync($"{ApiUri}/{wifiId}/review");
+        
+        Assert.Equal(HttpStatusCode.NoContent, getWifiReviewResponse.StatusCode);
     }
     
     private async Task<UserLoginResponseDto> CreateSampleUser(HttpClient client)
