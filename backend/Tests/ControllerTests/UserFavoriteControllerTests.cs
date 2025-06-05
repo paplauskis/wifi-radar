@@ -157,6 +157,19 @@ public class UserFavoriteControllerTests
         Assert.Equal(HttpStatusCode.NotFound, addFavoriteResponse.StatusCode);
         Assert.Equal($"User ID or wifi ID is not valid", addFavoriteResult);
     }
+
+    [Theory]
+    [InlineData("684140ad072cafedbe1c6577", "684140ad072cafedbe6c6574")]
+    [InlineData("684140ad072cafedbd6a6552", "684140ad072cafedbe6c1234")]
+    public async Task DeleteFavorite_WithValidUserOrWifiId_ShouldReturnOk(string userId, string wifiId)
+    {
+        await using var factory = new ApiWebApplicationFactory();
+        var client = factory.CreateClient();
+        
+        var response = await client.DeleteAsync($"{ApiUri}/{userId}/favorites/{wifiId}");
+        
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+    }
     
     private async Task<UserLoginResponseDto> CreateSampleUser(HttpClient client)
     {
