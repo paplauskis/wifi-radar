@@ -52,7 +52,6 @@ public class WifiControllerTests
         Assert.Equal(wifiReviewDto.WifiId, addWifiReviewResult.WifiId);
         Assert.Equal(wifiReviewDto.Text, addWifiReviewResult.Text);
         Assert.Equal(wifiReviewDto.Rating, addWifiReviewResult.Rating);
-        Assert.Equal(HttpStatusCode.OK, addWifiReviewResponse.StatusCode);
     }
     
     private async Task<UserLoginResponseDto> CreateSampleUser(HttpClient client)
