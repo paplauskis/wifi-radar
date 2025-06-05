@@ -20,16 +20,8 @@ public class UserFavoriteControllerTests
         var client = factory.CreateClient();
         
         var user = await CreateSampleUser(client);
-        var wifiNetwork = new WifiNetworkDto
-        {
-            WifiId = ObjectId.GenerateNewId().ToString(),
-            UserId = user.Id!,
-            City = "Kaunas",
-            Name = "City Hotels Algirdas",
-            Street = "Algirdo g.",
-            BuildingNumber = 24,
-            IsFree = true
-        };
+        var wifiNetwork = WifiNetworkDtoHelper.GetValidWifiNetworkDto(user);
+        
         var addFavoriteContent = new StringContent(JsonConvert.SerializeObject(wifiNetwork), Encoding.UTF8, "application/json");
         var addFavoriteResponse = await client.PostAsync($"{ApiUri}/{user.Id}/favorites", addFavoriteContent);
         var addFavoriteResult = await addFavoriteResponse.Content.ReadAsStringAsync();
@@ -71,16 +63,8 @@ public class UserFavoriteControllerTests
         var client = factory.CreateClient();
         
         var user = await CreateSampleUser(client);
-        var wifiNetwork = new WifiNetworkDto
-        {
-            WifiId = ObjectId.GenerateNewId().ToString(),
-            UserId = user.Id!,
-            City = "Kaunas",
-            Name = "City Hotels Algirdas",
-            Street = "Algirdo g.",
-            BuildingNumber = 24,
-            IsFree = true
-        };
+        var wifiNetwork = WifiNetworkDtoHelper.GetValidWifiNetworkDto(user);
+        
         var addFavoriteContent = new StringContent(JsonConvert.SerializeObject(wifiNetwork), Encoding.UTF8, "application/json");
         var addFavoriteResponse = await client.PostAsync($"{ApiUri}/{invalidUserId}/favorites", addFavoriteContent);
         var addFavoriteResult = await addFavoriteResponse.Content.ReadAsStringAsync();
@@ -96,16 +80,8 @@ public class UserFavoriteControllerTests
         var client = factory.CreateClient();
         
         var user = await CreateSampleUser(client);
-        var wifiNetwork = new WifiNetworkDto
-        {
-            WifiId = ObjectId.GenerateNewId().ToString(),
-            UserId = user.Id!,
-            City = "Kaunas",
-            Name = "City Hotels Algirdas",
-            Street = "Algirdo g.",
-            BuildingNumber = 24,
-            IsFree = true
-        };
+        var wifiNetwork = WifiNetworkDtoHelper.GetValidWifiNetworkDto(user);
+        
         var addFavoriteContent = new StringContent(JsonConvert.SerializeObject(wifiNetwork), Encoding.UTF8, "application/json");
         await client.PostAsync($"{ApiUri}/{user.Id}/favorites", addFavoriteContent);
         var addFavoriteResponse = await client.PostAsync($"{ApiUri}/{user.Id}/favorites", addFavoriteContent);
