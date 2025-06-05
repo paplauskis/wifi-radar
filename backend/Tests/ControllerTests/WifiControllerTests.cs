@@ -67,7 +67,7 @@ public class WifiControllerTests
         var getWifiReviewResult = await getWifiReviewResponse.Content.ReadAsStringAsync();
         
         Assert.Equal(HttpStatusCode.BadRequest, getWifiReviewResponse.StatusCode);
-        Assert.Equal("Invalid wifi id", getWifiReviewResult);
+        Assert.Equal($"Invalid wifi id: \"{wifiId}\"", getWifiReviewResult);
     }
 
     //ensure AddWifiReview works first
@@ -112,6 +112,22 @@ public class WifiControllerTests
         var getWifiReviewResponse = await client.GetAsync($"{ApiUri}/{wifiId}/review");
         
         Assert.Equal(HttpStatusCode.NoContent, getWifiReviewResponse.StatusCode);
+    }
+    
+    [Theory]
+    [InlineData("randomID12313")]
+    [InlineData("i")]
+    [InlineData("6839")]
+    public async Task AddPassword_WithInvalidWifiId_ShouldReturnBadRequest(string wifiId)
+    {
+        await using var factory = new ApiWebApplicationFactory();
+        var client = factory.CreateClient();
+        
+        var getWifiReviewResponse = await client.GetAsync($"{ApiUri}/{wifiId}/password");
+        var getWifiReviewResult = await getWifiReviewResponse.Content.ReadAsStringAsync();
+        
+        Assert.Equal(HttpStatusCode.BadRequest, getWifiReviewResponse.StatusCode);
+        Assert.Equal($"Invalid wifi id: \"{wifiId}\"", getWifiReviewResult);
     }
     
     private async Task<UserLoginResponseDto> CreateSampleUser(HttpClient client)
