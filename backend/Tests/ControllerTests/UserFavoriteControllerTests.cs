@@ -118,6 +118,26 @@ public class UserFavoriteControllerTests
         
         Assert.Equal(HttpStatusCode.NoContent, addFavoriteResponse.StatusCode);
     }
+
+    [Fact]
+    public async Task GetFavorites_WithValidUserIdAndExistingFavorites_ShouldReturnOk()
+    {
+        await using var factory = new ApiWebApplicationFactory();
+        var client = factory.CreateClient();
+        var user = await CreateSampleUser(client);
+        var wifiNetwork = WifiNetworkDtoHelper.GetValidWifiNetworkDto(user);
+        
+        var addFavoriteContent = new StringContent(JsonConvert.SerializeObject(wifiNetwork), Encoding.UTF8, "application/json");
+        var addFavoriteResponse = await client.PostAsync($"{ApiUri}/{user.Id}/favorites", addFavoriteContent);
+        
+        var getFavoritesResponse = await client.GetAsync($"{ApiUri}/{user.Id}/favorites");
+        var getFavoritesResult = await getFavoritesResponse.Content.ReadFromJsonAsync<List<WifiNetworkDto>>();
+        
+        Assert.Equal(HttpStatusCode.OK, addFavoriteResponse.StatusCode);
+        Assert.Equal(HttpStatusCode.OK, getFavoritesResponse.StatusCode);
+        Assert.NotNull(getFavoritesResult);
+        Assert.Single(getFavoritesResult);
+    }
     
     [Theory]
     [InlineData("invalidUserId", "684140ad072cafedbe6c6574")]
