@@ -27,10 +27,7 @@ public class WifiControllerTests
         var addWifiReviewResult = await addWifiReviewResponse.Content.ReadAsStringAsync();
     
         Assert.Equal(HttpStatusCode.BadRequest, addWifiReviewResponse.StatusCode);
-        Assert.Contains(wifiReviewDto.WifiId!, addWifiReviewResult);
-        Assert.Contains(wifiReviewDto.UserId, addWifiReviewResult);
-        Assert.Contains(wifiReviewDto.Text!, addWifiReviewResult);
-        Assert.Contains(wifiReviewDto.Rating.ToString()!, addWifiReviewResult);
+        Assert.Equal("Invalid data passed", addWifiReviewResult);
     }
     
     private async Task<UserLoginResponseDto> CreateSampleUser(HttpClient client)
