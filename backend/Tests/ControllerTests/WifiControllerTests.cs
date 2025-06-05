@@ -118,12 +118,15 @@ public class WifiControllerTests
     [InlineData("randomID12313")]
     [InlineData("i")]
     [InlineData("6839")]
-    public async Task GetPasswords_WithInvalidWifiId_ShouldReturnBadRequest(string wifiId)
+    public async Task AddPassword_WithInvalidWifiId_ShouldReturnBadRequest(string wifiId)
     {
         await using var factory = new ApiWebApplicationFactory();
         var client = factory.CreateClient();
+        var user = await CreateSampleUser(client);
+        var passwordDto = new PasswordDto { Password = "very_secret_password", UserId = user.Id };
         
-        var getPasswordsResponse = await client.GetAsync($"{ApiUri}/{wifiId}/password");
+        var getPasswordsContent = new StringContent(JsonConvert.SerializeObject(passwordDto), Encoding.UTF8, "application/json");
+        var getPasswordsResponse = await client.PostAsync($"{ApiUri}/{wifiId}/password", getPasswordsContent);
         var getPasswordsResult = await getPasswordsResponse.Content.ReadAsStringAsync();
         
         Assert.Equal(HttpStatusCode.BadRequest, getPasswordsResponse.StatusCode);
@@ -134,15 +137,12 @@ public class WifiControllerTests
     [InlineData("randomID12313")]
     [InlineData("i")]
     [InlineData("6839")]
-    public async Task AddPassword_WithInvalidWifiId_ShouldReturnBadRequest(string wifiId)
+    public async Task GetPasswords_WithInvalidWifiId_ShouldReturnBadRequest(string wifiId)
     {
         await using var factory = new ApiWebApplicationFactory();
         var client = factory.CreateClient();
-        var user = await CreateSampleUser(client);
-        var passwordDto = new PasswordDto { Password = "very_secret_password", UserId = user.Id };
         
-        var getPasswordsContent = new StringContent(JsonConvert.SerializeObject(passwordDto), Encoding.UTF8, "application/json");
-        var getPasswordsResponse = await client.PostAsync($"{ApiUri}/{wifiId}/password", getPasswordsContent);
+        var getPasswordsResponse = await client.GetAsync($"{ApiUri}/{wifiId}/password");
         var getPasswordsResult = await getPasswordsResponse.Content.ReadAsStringAsync();
         
         Assert.Equal(HttpStatusCode.BadRequest, getPasswordsResponse.StatusCode);
