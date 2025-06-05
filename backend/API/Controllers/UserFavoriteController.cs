@@ -44,8 +44,8 @@ public class UserFavoriteController : ControllerBase
         }
     }
 
-    [HttpDelete("{userId}/favorites")]
-    public async Task<IActionResult> DeleteFavorite([FromRoute] string userId, [FromBody] string wifiId)
+    [HttpDelete("{userId}/favorites/{wifiId}")]
+    public async Task<IActionResult> DeleteFavorite([FromRoute] string userId, [FromRoute] string wifiId)
     {
         try
         { 
