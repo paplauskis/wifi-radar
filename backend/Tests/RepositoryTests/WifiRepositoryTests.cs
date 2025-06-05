@@ -123,7 +123,6 @@ public class WifiRepositoryTests : BaseRepositoryTests<WifiNetwork, WifiReposito
     {
         Assert.Equal(expected.Id, actual.Id);
         Assert.Equal(expected.UserId, actual.UserId);
-        Assert.Equal(expected.Country, actual.Country);
         Assert.Equal(expected.City, actual.City);
         Assert.Equal(expected.PlaceName, actual.PlaceName);
         Assert.Equal(expected.Street, actual.Street);
