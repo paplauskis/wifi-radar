@@ -106,6 +106,18 @@ public class UserFavoriteControllerTests
         Assert.Equal(HttpStatusCode.NotFound, addFavoriteResponse.StatusCode);
         Assert.Equal($"User ID \"{invalidUserId}\" is not valid", addFavoriteResult);
     }
+
+    [Fact]
+    public async Task GetFavorites_WithValidUserIdAndNoFavorites_ShouldReturnNoContent()
+    {
+        await using var factory = new ApiWebApplicationFactory();
+        var client = factory.CreateClient();
+        var user = await CreateSampleUser(client);
+        
+        var addFavoriteResponse = await client.GetAsync($"{ApiUri}/{user.Id}/favorites");
+        
+        Assert.Equal(HttpStatusCode.NoContent, addFavoriteResponse.StatusCode);
+    }
     
     [Theory]
     [InlineData("invalidUserId", "684140ad072cafedbe6c6574")]
