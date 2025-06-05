@@ -91,6 +91,22 @@ public class UserFavoriteControllerTests
         Assert.Equal("The same wifi network already is saved by this user", addFavoriteResult);
     }
     
+    [Theory]
+    [InlineData("invalidUserId")]
+    [InlineData("71cthn8049")]
+    [InlineData("id")]
+    public async Task GetFavorites_WithInvalidUserId_ShouldReturnNotFound(string? invalidUserId)
+    {
+        await using var factory = new ApiWebApplicationFactory();
+        var client = factory.CreateClient();
+        
+        var addFavoriteResponse = await client.GetAsync($"{ApiUri}/{invalidUserId}/favorites");
+        var addFavoriteResult = await addFavoriteResponse.Content.ReadAsStringAsync();
+        
+        Assert.Equal(HttpStatusCode.NotFound, addFavoriteResponse.StatusCode);
+        Assert.Equal($"User ID \"{invalidUserId}\" is not valid", addFavoriteResult);
+    }
+    
     private async Task<UserLoginResponseDto> CreateSampleUser(HttpClient client)
     {
         var user = new UserLoginRequestDto { Username = "sampleUser", Password = "randomPassword123" };
