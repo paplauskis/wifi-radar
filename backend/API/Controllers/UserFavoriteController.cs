@@ -1,4 +1,5 @@
-using API.Domain.Models;
+using API.Domain.Dto;
+using API.Helpers.Mappers;
 using API.Services.Interfaces.User;
 using Microsoft.AspNetCore.Mvc;
 
@@ -30,11 +31,11 @@ public class UserFavoriteController : ControllerBase
     }
 
     [HttpPost("{userId}/favorites")]
-    public async Task<IActionResult> AddFavorite([FromRoute] string userId, [FromBody] WifiNetwork wifi)
+    public async Task<IActionResult> AddFavorite([FromRoute] string userId, [FromBody] WifiNetworkDto dto)
     {
         try
-        { 
-            var addedFavorite = await _userFavoriteService.AddUserFavoriteAsync(userId, wifi);
+        {
+            var addedFavorite = await _userFavoriteService.AddUserFavoriteAsync(userId, dto);
             return Ok(addedFavorite);
         }
         catch (Exception e) // specific exception handling will be implemented later
