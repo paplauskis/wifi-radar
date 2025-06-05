@@ -115,4 +115,18 @@ public static class WifiNetworkDtoHelper
             }
         };
     }
+
+    public static WifiNetworkDto GetValidWifiNetworkDto(UserLoginResponseDto user)
+    {
+        return new WifiNetworkDto
+        {
+            WifiId = ObjectId.GenerateNewId().ToString(),
+            UserId = user.Id!,
+            City = "Kaunas",
+            Name = "City Hotels Algirdas",
+            Street = "Algirdo g.",
+            BuildingNumber = 24,
+            IsFree = true
+        };
+    }
 }
