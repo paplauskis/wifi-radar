@@ -14,9 +14,9 @@ public class MapController : ControllerBase
     {
         _mapService = mapService;
     }
-    
-    [HttpGet("search")]
-    public async Task<IActionResult> Search([FromQuery] string city, [FromQuery] int? radius) //radius in meters
+
+    [HttpGet]
+    public async Task<IActionResult> GetNearbyWifi([FromQuery] string city, [FromQuery] int? radius) // radius in meters
     {
         try
         {
@@ -35,9 +35,9 @@ public class MapController : ControllerBase
         {
             return NoContent();
         }
-        catch (Exception e)
+        catch (Exception)
         {
-            return StatusCode(500, $"Unexpected error occured: {e.Message}");
+            return StatusCode(500, "Unexpected error occurred.");
         }
     }
 }
