@@ -1,10 +1,10 @@
 using API.Domain;
 using API.Domain.Models;
+using API.Exceptions;
 using API.Services.Interfaces.Wifi;
+using Microsoft.AspNetCore.Mvc;
 
 namespace API.Controllers;
-
-using Microsoft.AspNetCore.Mvc;
 
 [ApiController]
 [Route("/api/wifi")]
@@ -12,7 +12,7 @@ public class WifiController : ControllerBase
 {
     private readonly IWifiReviewService _wifiSearchService;
     private readonly IWifiPasswordSharingService _wifiPasswordSharingService;
-    
+
     public WifiController(IWifiReviewService wifiSearchService, IWifiPasswordSharingService wifiPasswordSharingService)
     {
         _wifiSearchService = wifiSearchService;
@@ -23,13 +23,21 @@ public class WifiController : ControllerBase
     public async Task<IActionResult> GetWifiReviews([FromRoute] string wifiId)
     {
         try
-        { 
+        {
             var reviews = await _wifiSearchService.GetReviewsAsync(wifiId);
             return Ok(reviews);
         }
-        catch (Exception e) // specific exception handling will be implemented later
+        catch (NotFoundException e)
+        {
+            return NotFound(e.Message);
+        }
+        catch (InvalidInputException e)
         {
             return BadRequest(e.Message);
+        }
+        catch (Exception)
+        {
+            return StatusCode(500, "Unexpected server error occurred");
         }
     }
 
@@ -42,9 +50,21 @@ public class WifiController : ControllerBase
             var review = await _wifiSearchService.AddReviewAsync(wifiReviewDto);
             return Ok(review);
         }
-        catch (Exception e) // specific exception handling will be implemented later
+        catch (NotFoundException e)
+        {
+            return NotFound(e.Message);
+        }
+        catch (InvalidInputException e)
         {
             return BadRequest(e.Message);
+        }
+        catch (ConflictException e)
+        {
+            return Conflict(e.Message);
+        }
+        catch (Exception)
+        {
+            return StatusCode(500, "Unexpected server error occurred");
         }
     }
 
@@ -56,9 +76,17 @@ public class WifiController : ControllerBase
             var passwords = await _wifiPasswordSharingService.GetPasswordsAsync(wifiId);
             return Ok(passwords);
         }
-        catch (Exception e) // specific exception handling will be implemented later
+        catch (NotFoundException e)
+        {
+            return NotFound(e.Message);
+        }
+        catch (InvalidInputException e)
         {
             return BadRequest(e.Message);
+        }
+        catch (Exception)
+        {
+            return StatusCode(500, "Unexpected server error occurred");
         }
     }
 
@@ -70,9 +98,21 @@ public class WifiController : ControllerBase
             var password = await _wifiPasswordSharingService.AddPasswordAsync(passwordDto);
             return Ok(password);
         }
-        catch (Exception e) // specific exception handling will be implemented later
+        catch (NotFoundException e)
+        {
+            return NotFound(e.Message);
+        }
+        catch (ConflictException e)
+        {
+            return Conflict(e.Message);
+        }
+        catch (InvalidInputException e)
         {
             return BadRequest(e.Message);
+        }
+        catch (Exception)
+        {
+            return StatusCode(500, "Unexpected server error occurred");
         }
     }
 }
