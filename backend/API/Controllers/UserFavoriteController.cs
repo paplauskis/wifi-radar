@@ -1,5 +1,5 @@
 using API.Domain.Dto;
-using API.Helpers.Mappers;
+using API.Exceptions;
 using API.Services.Interfaces.User;
 using Microsoft.AspNetCore.Mvc;
 
@@ -24,9 +24,17 @@ public class UserFavoriteController : ControllerBase
             var favorites = await _userFavoriteService.GetUserFavoritesAsync(userId);
             return Ok(favorites);
         }
-        catch (Exception e) // specific exception handling will be implemented later
+        catch (NotFoundException e)
+        {
+            return NotFound(e.Message);
+        }
+        catch (InvalidInputException e)
         {
             return BadRequest(e.Message);
+        }
+        catch (Exception)
+        {
+            return StatusCode(500, "Unexpected server error occurred");
         }
     }
 
@@ -38,9 +46,21 @@ public class UserFavoriteController : ControllerBase
             var addedFavorite = await _userFavoriteService.AddUserFavoriteAsync(userId, dto);
             return Ok(addedFavorite);
         }
-        catch (Exception e) // specific exception handling will be implemented later
+        catch (NotFoundException e)
+        {
+            return NotFound(e.Message);
+        }
+        catch (ConflictException e)
+        {
+            return Conflict(e.Message);
+        }
+        catch (InvalidInputException e)
         {
             return BadRequest(e.Message);
+        }
+        catch (Exception)
+        {
+            return StatusCode(500, "Unexpected server error occurred");
         }
     }
 
@@ -52,9 +72,17 @@ public class UserFavoriteController : ControllerBase
             await _userFavoriteService.DeleteUserFavoriteAsync(userId, wifiId);
             return Ok();
         }
-        catch (Exception e) // specific exception handling will be implemented later
+        catch (NotFoundException e)
+        {
+            return NotFound(e.Message);
+        }
+        catch (InvalidInputException e)
         {
             return BadRequest(e.Message);
+        }
+        catch (Exception)
+        {
+            return StatusCode(500, "Unexpected server error occurred");
         }
     }
 }

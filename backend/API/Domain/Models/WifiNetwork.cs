@@ -7,7 +7,6 @@ namespace API.Domain.Models;
 
 public class WifiNetwork : TimeStampedEntity
 {
-
     private string _userId;
 
     [BsonElement("UserID")]
@@ -18,14 +17,13 @@ public class WifiNetwork : TimeStampedEntity
         set
         {
             if (string.IsNullOrWhiteSpace(value))
-            {
                 throw new ArgumentException($"UserId cannot be set to {value}");
-            }
             _userId = value;
         }
     }
 
     private string _city;
+
     [BsonElement("City")]
     public string City
     {
@@ -33,9 +31,7 @@ public class WifiNetwork : TimeStampedEntity
         set
         {
             if (string.IsNullOrWhiteSpace(value))
-            {
-               throw new ArgumentException($"City cannot be set to {value}");
-            }               
+                throw new ArgumentException($"City cannot be set to {value}");
             _city = value;
         }
     }
@@ -50,9 +46,7 @@ public class WifiNetwork : TimeStampedEntity
         set
         {
             if (string.IsNullOrWhiteSpace(value))
-            {
                 throw new ArgumentException($"PlaceName cannot be set to {value}");
-            }
             _placeName = value;
         }
     }
@@ -67,9 +61,7 @@ public class WifiNetwork : TimeStampedEntity
         set
         {
             if (string.IsNullOrWhiteSpace(value))
-            {
                 throw new ArgumentException($"Street cannot be set to {value}");
-            }
             _street = value;
         }
     }
@@ -77,16 +69,13 @@ public class WifiNetwork : TimeStampedEntity
     private int _buildingNumber;
 
     [BsonElement("BuildingNumber")]
-
     public int BuildingNumber
     {
         get => _buildingNumber;
         set
         {
             if (value <= 0 || value == int.MaxValue)
-            {
                 throw new ArgumentException($"BuildingNumber cannot be set to {value}");
-            }
             _buildingNumber = value;
         }
     }
@@ -104,7 +93,6 @@ public class WifiNetwork : TimeStampedEntity
             {
                 if (value <= 0 || value > 99999)
                     throw new ArgumentException($"PostalCode cannot be set to {value}");
-
                 _postalCode = value.Value;
             }
             else
@@ -132,16 +120,22 @@ public class WifiNetwork : TimeStampedEntity
         set
         {
             if (!_isFree && string.IsNullOrWhiteSpace(value))
-            {
                 throw new ArgumentException($"Password cannot be set to {value}");
-            }
 
             if (!string.IsNullOrWhiteSpace(value) && value.Length > 100)
-            {
                 throw new ArgumentException($"Password cannot be set to {value}");
-            }
 
             _password = value;
         }
+    }
+
+    private List<string> _passwords = new();
+
+    [BsonElement("Passwords")]
+    [JsonPropertyName("Passwords")]
+    public List<string> Passwords
+    {
+        get => _passwords;
+        set => _passwords = value ?? new List<string>();
     }
 }
