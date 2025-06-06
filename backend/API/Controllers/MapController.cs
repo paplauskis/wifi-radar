@@ -1,4 +1,4 @@
-using API.Domain.Exceptions;
+using API.Exceptions;
 using API.Services.Interfaces.Map;
 using Microsoft.AspNetCore.Mvc;
 
@@ -16,20 +16,16 @@ public class MapController : ControllerBase
     }
 
     [HttpGet]
-    public async Task<IActionResult> GetNearbyWifi([FromQuery] string city, [FromQuery] int? radius) // radius in meters
+    public async Task<IActionResult> GetNearbyWifi([FromQuery] string city, [FromQuery] int? radius)
     {
         try
         {
             var wifis = await _mapService.Search(city, radius);
             return Ok(wifis);
         }
-        catch (ArgumentNullException ane)
+        catch (InvalidInputException e)
         {
-            return BadRequest(ane.Message);
-        }
-        catch (ArgumentException ae)
-        {
-            return BadRequest(ae.Message);
+            return BadRequest(e.Message);
         }
         catch (EmptyResponseException)
         {
