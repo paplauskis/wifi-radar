@@ -38,19 +38,15 @@ public class WifiReviewService : IWifiReviewService
             throw new ArgumentNullException(nameof(wifiReviewDto));
         }
 
-        var wifi = await _wifiRepository.GetByIdAsync(wifiReviewDto.WifiId);
-        if (wifi == null)
-        {
-            throw new KeyNotFoundException($"Wifi network with ID '{wifiReviewDto.WifiId}' was not found.");
-        }
-
         var newReview = new WifiReview
         {
             Id = Guid.NewGuid().ToString(),
-            WifiId = wifiReviewDto.WifiId,
             UserId = wifiReviewDto.UserId,
             Rating = (int)wifiReviewDto.Rating,
             Text = wifiReviewDto.Text,
+            City = wifiReviewDto.City,
+            Street = wifiReviewDto.Street,
+            BuildingNumber = (int)wifiReviewDto.BuildingNumber,
             CreatedAt = DateTime.UtcNow
         };
 
