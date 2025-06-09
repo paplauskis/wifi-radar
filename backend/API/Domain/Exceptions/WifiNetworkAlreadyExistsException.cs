@@ -5,7 +5,7 @@ namespace API.Domain.Exceptions;
 
 public class WifiNetworkAlreadyExistsException : Exception
 {
-    WifiNetworkDto WifiNetwork { get; init; }
+    public WifiNetworkDto WifiNetwork { get; private set; }
     
     public WifiNetworkAlreadyExistsException(string message, WifiNetworkDto dto) : base(message)
     {
