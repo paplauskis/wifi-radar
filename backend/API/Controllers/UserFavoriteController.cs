@@ -26,7 +26,7 @@ public class UserFavoriteController : ControllerBase
         }
         catch (NotFoundException e)
         {
-            return NotFound(e.Message);
+            return NoContent();
         }
         catch (InvalidInputException e)
         {
