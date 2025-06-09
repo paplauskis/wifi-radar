@@ -91,7 +91,7 @@ public class WifiNetwork : TimeStampedEntity
         {
             if (value.HasValue)
             {
-                if (value <= 0 || value > 99999)
+                if (value < 0 || value > 99999)
                     throw new ArgumentException($"PostalCode cannot be set to {value}");
                 _postalCode = value.Value;
             }
