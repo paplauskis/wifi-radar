@@ -1,4 +1,5 @@
 using API.Domain.Dto;
+using API.Domain.Exceptions;
 using API.Exceptions;
 using API.Services.Interfaces.User;
 using Microsoft.AspNetCore.Mvc;
@@ -20,17 +21,21 @@ public class UserFavoriteController : ControllerBase
     public async Task<IActionResult> GetFavorites([FromRoute] string userId)
     {
         try
-        { 
+        {
             var favorites = await _userFavoriteService.GetUserFavoritesAsync(userId);
             return Ok(favorites);
         }
         catch (NotFoundException e)
         {
-            return NotFound(e.Message);
+            return NoContent();
         }
         catch (InvalidInputException e)
         {
             return BadRequest(e.Message);
+        }
+        catch (WifiNetworkAlreadyExistsException e)
+        {
+            return Conflict(e);
         }
         catch (Exception)
         {

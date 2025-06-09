@@ -1,8 +1,10 @@
 using API.Domain.Dto;
+using API.Domain.Exceptions;
 using API.Domain.Models;
 using API.Helpers.Mappers;
 using API.Services.Interfaces.User;
 using API.Exceptions;
+using MongoDB.Bson;
 using MongoDB.Driver;
 
 namespace API.Services.Users
@@ -18,19 +20,19 @@ namespace API.Services.Users
             _wifiNetworks = database.GetCollection<WifiNetwork>("Favorite-WiFi-Spots");
         }
 
-        public async Task<List<WifiNetworkDto>> GetUserFavoritesAsync(string username)
+        public async Task<List<WifiNetworkDto>> GetUserFavoritesAsync(string userId)
         {
-            if (string.IsNullOrWhiteSpace(username))
+            if (string.IsNullOrWhiteSpace(userId))
                 throw new InvalidDataException("username cannot be null or empty.");
-
-            var ids = await GetFavoriteNetworkIdsAsync(username);
+            
+            var ids = await GetFavoriteNetworkIdsAsync(userId);
             if (ids == null || !ids.Any()) return new List<WifiNetworkDto>();
 
             var filter = Builders<WifiNetwork>.Filter.In(w => w.Id, ids);
             var wifiNetworkList = await _wifiNetworks.Find(filter).ToListAsync();
-
+            
             if (wifiNetworkList == null || !wifiNetworkList.Any())
-                throw new WifiNetworkNotFoundException("None of the user's favorite Wifi networks were found.");
+                throw new NotFoundException("None of the user's favorite Wifi networks were found.");
 
             var dtoList = new List<WifiNetworkDto>();
             foreach (var wifiNetwork in wifiNetworkList)
@@ -41,21 +43,27 @@ namespace API.Services.Users
             return dtoList;
         }
 
-        public async Task<WifiNetworkDto> AddUserFavoriteAsync(string username, WifiNetworkDto wifi)
+        public async Task<WifiNetworkDto> AddUserFavoriteAsync(string userId, WifiNetworkDto wifi)
         {
-            if (string.IsNullOrWhiteSpace(username))
+            if (string.IsNullOrWhiteSpace(userId))
                 throw new InvalidInputException("Username cannot be null or empty.");
             if (wifi == null || string.IsNullOrWhiteSpace(wifi.WifiId))
-                throw new InvalidInputException("Wifi data is invalid or missing WifiId.");
+                wifi.WifiId = ObjectId.GenerateNewId().ToString();
 
-            var user = await _users.Find(u => u.Id == username).FirstOrDefaultAsync();
+            // should check if a WifiNetwork with the same City, Street and BuildingNumber is already saved by the user
+            // if the WifiNetwork exists, the doesWifiAlreadyExist variable should be true
+            bool doesWifiAlreadyExist = false;
+            if (doesWifiAlreadyExist)
+                throw new WifiNetworkAlreadyExistsException("Wifi network already exists.", wifi);
+
+            var user = await _users.Find(u => u.Id == userId).FirstOrDefaultAsync();
             if (user == null)
-                throw new UserNotFoundException(username);
+                throw new UserNotFoundException(userId);
 
             if (user.FavoriteNetworkId != null && user.FavoriteNetworkId.Contains(wifi.WifiId))
                 throw new ConflictException("The same wifi network already is saved by this user");
 
-            var filter = Builders<User>.Filter.Eq(u => u.Id, username);
+            var filter = Builders<User>.Filter.Eq(u => u.Id, userId);
             var update = Builders<User>.Update.AddToSet(u => u.FavoriteNetworkId, wifi.WifiId);
             await _users.UpdateOneAsync(filter, update);
 
@@ -68,27 +76,27 @@ namespace API.Services.Users
             return wifi;
         }
 
-        public async Task DeleteUserFavoriteAsync(string username, string wifiId)
+        public async Task DeleteUserFavoriteAsync(string userId, string wifiId)
         {
-            if (string.IsNullOrWhiteSpace(username))
+            if (string.IsNullOrWhiteSpace(userId))
                 throw new InvalidDataException("Username cannot be null or empty.");
             if (string.IsNullOrWhiteSpace(wifiId))
                 throw new InvalidDataException("WifiId cannot be null or empty");
 
-            var user = await _users.Find(u => u.Username == username).FirstOrDefaultAsync();
+            var user = await _users.Find(u => u.Id == userId).FirstOrDefaultAsync();
             if (user == null)
-                throw new UserNotFoundException(username);
+                throw new UserNotFoundException(userId);
 
-            var filter = Builders<User>.Filter.Eq(u => u.Username, username);
+            var filter = Builders<User>.Filter.Eq(u => u.Id, userId);
             var update = Builders<User>.Update.Pull(u => u.FavoriteNetworkId, wifiId);
             await _users.UpdateOneAsync(filter, update);
         }
-
-        private async Task<List<string>> GetFavoriteNetworkIdsAsync(string username)
+        
+        private async Task<List<string>> GetFavoriteNetworkIdsAsync(string userId)
         {
-            var user = await _users.Find(u => u.Username == username).FirstOrDefaultAsync();
+            var user = await _users.Find(u => u.Id == userId).FirstOrDefaultAsync();
             if (user == null)
-                throw new UserNotFoundException(username);
+                throw new UserNotFoundException(userId);
 
             return user?.FavoriteNetworkId ?? new List<string>();
         }

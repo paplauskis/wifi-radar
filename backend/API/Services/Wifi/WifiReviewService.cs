@@ -17,15 +17,19 @@ public class WifiReviewService : IWifiReviewService
         _wifiReviewRepository = wifiReviewRepository;
     }
 
-    public async Task<List<WifiReview>> GetReviewsAsync(string wifiId)
+    // should return WifiNetwork reviews that match the city, street and building number.
+    // the method currently does not compile, so it needs fixing.
+    // method should also check city, street and building number to not be null values,
+    // because otherwise the search will not be accurate.
+    // if arguments are null, throw ArgumentNullException.
+    public async Task<List<WifiReview>> GetReviewsAsync(string city, string street, int buildingNumber)
     {
         if (string.IsNullOrWhiteSpace(wifiId))
-        
             throw new ArgumentException("Wifi ID must be provided.", nameof(wifiId));
-
-        var wifi = await _wifiRepository.GetByIdAsync(wifiId);
-        if (wifi == null)
         
+        var wifi = await _wifiRepository.GetByIdAsync(wifiId);
+        
+        if (wifi == null)
             throw new KeyNotFoundException($"Wifi network with ID '{wifiId}' was not found.");
         
         return await _wifiReviewRepository.GetReviewsByWifiIdAsync(wifiId);
@@ -38,19 +42,15 @@ public class WifiReviewService : IWifiReviewService
             throw new ArgumentNullException(nameof(wifiReviewDto));
         }
 
-        var wifi = await _wifiRepository.GetByIdAsync(wifiReviewDto.WifiId);
-        if (wifi == null)
-        {
-            throw new KeyNotFoundException($"Wifi network with ID '{wifiReviewDto.WifiId}' was not found.");
-        }
-
         var newReview = new WifiReview
         {
             Id = Guid.NewGuid().ToString(),
-            WifiId = wifiReviewDto.WifiId,
             UserId = wifiReviewDto.UserId,
             Rating = (int)wifiReviewDto.Rating,
             Text = wifiReviewDto.Text,
+            City = wifiReviewDto.City,
+            Street = wifiReviewDto.Street,
+            BuildingNumber = (int)wifiReviewDto.BuildingNumber,
             CreatedAt = DateTime.UtcNow
         };
 

@@ -69,4 +69,13 @@ public class WifiReview : TimeStampedEntity
             _rating = value;
         }
     }
+    
+    // need to add null checks for the properties below
+    // if property is null, throw ArgumentNullException
+    
+    public string City { get; set; }
+    
+    public string Street { get; set; }
+    
+    public int BuildingNumber { get; set; }
 }

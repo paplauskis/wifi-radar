@@ -10,21 +10,24 @@ namespace API.Controllers;
 [Route("/api/wifi")]
 public class WifiController : ControllerBase
 {
-    private readonly IWifiReviewService _wifiSearchService;
+    private readonly IWifiReviewService _wifiReviewService;
     private readonly IWifiPasswordSharingService _wifiPasswordSharingService;
 
-    public WifiController(IWifiReviewService wifiSearchService, IWifiPasswordSharingService wifiPasswordSharingService)
+    public WifiController(IWifiReviewService wifiReviewService, IWifiPasswordSharingService wifiPasswordSharingService)
     {
-        _wifiSearchService = wifiSearchService;
+        _wifiReviewService = wifiReviewService;
         _wifiPasswordSharingService = wifiPasswordSharingService;
     }
 
-    [HttpGet("{wifiId}/review")]
-    public async Task<IActionResult> GetWifiReviews([FromRoute] string wifiId)
+    [HttpGet("reviews")]
+    public async Task<IActionResult> GetWifiReviews(
+        [FromQuery] string city, 
+        [FromQuery] string street, 
+        [FromQuery] int buildingNumber)
     {
         try
         {
-            var reviews = await _wifiSearchService.GetReviewsAsync(wifiId);
+            var reviews = await _wifiReviewService.GetReviewsAsync(city, street, buildingNumber);
             return Ok(reviews);
         }
         catch (NotFoundException e)
@@ -41,13 +44,12 @@ public class WifiController : ControllerBase
         }
     }
 
-    [HttpPost("{wifiId}/review")]
-    public async Task<IActionResult> AddWifiReview([FromRoute] string wifiId, [FromBody] WifiReviewDto wifiReviewDto)
+    [HttpPost("reviews")]
+    public async Task<IActionResult> AddWifiReview([FromBody] WifiReviewDto wifiReviewDto)
     {
         try
         {
-            wifiReviewDto.WifiId = wifiId;
-            var review = await _wifiSearchService.AddReviewAsync(wifiReviewDto);
+            var review = await _wifiReviewService.AddReviewAsync(wifiReviewDto);
             return Ok(review);
         }
         catch (NotFoundException e)
