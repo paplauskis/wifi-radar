@@ -2,7 +2,7 @@
 
 ### Tech stack:
 - frontend - Vue.js
-- backend - ASP.NET
+- backend - ASP.NET (C#)
 - DB - MongoDB
 
 ### API endpoints
@@ -12,8 +12,8 @@
 - POST api/user/{userId}/favorites (wifi object)
 - GET api/user/{userId}/favorites
 - DELETE api/user/{userId}/favorites/{wifiId}
-- POST api/wifi/review/{wifiId} (per body perduot user, comment, rating)
-- GET api/wifi/review/{wifiId}
+- POST api/wifi/reviews (per body perduot WifiReviewDto)
+- GET api/wifi/reviews/{wifiId}?city={value}&street={value}&buildingNumber={value}
 - POST /api/wifi/password/{wifiId} (body - password, userId)
 - GET api/wifi/password/{wifiId}
 - POST api/user/auth/login (body - username, email)
