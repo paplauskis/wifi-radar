@@ -72,10 +72,54 @@ public class WifiReview : TimeStampedEntity
     
     // need to add null checks for the properties below
     // if property is null, throw ArgumentNullException
+    private string _city;
+
+    [BsonElement("City")]
+    public string City
+    {
+        get => _city;
+        set
+        {
+            if (string.IsNullOrEmpty(value))
+                throw new ArgumentNullException(nameof(value));
+            
+            if (value.Length > 100)
+                throw new ArgumentException("City name length must be less than 100 characters");
+            
+            _city = value;
+        }
+    }
     
-    public string City { get; set; }
+    private string _street;
+
+    [BsonElement("Street")]
+    public string Street
+    {
+        get => _street;
+        set
+        {
+            if (string.IsNullOrEmpty(value))
+                throw new ArgumentNullException(nameof(value));
+            
+            if (value.Length > 100)
+                throw new ArgumentException("Street name length must be less than 100 characters");
+            
+            _street = value;
+        }
+    }
     
-    public string Street { get; set; }
-    
-    public int BuildingNumber { get; set; }
+    private int _buildingNumber;
+
+    [BsonElement("BuildingNumber")]
+    public int BuildingNumber
+    {
+        get => _buildingNumber;
+        set
+        {
+            if (value < 1 || value > 10000)
+                throw new ArgumentException("Invalid building number: " + value);
+            
+            _buildingNumber = value;
+        }
+    }
 }
