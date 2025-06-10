@@ -2,7 +2,8 @@ using API.Data.Repositories.Interfaces;
 using API.Domain;
 using API.Services.Interfaces.Wifi;
 using API.Domain.Models;
-using API.Data.Repositories;
+using API.Domain.Exceptions;
+using MongoDB.Bson;
 
 namespace API.Services.Wifi;
 
@@ -17,22 +18,19 @@ public class WifiReviewService : IWifiReviewService
         _wifiReviewRepository = wifiReviewRepository;
     }
 
-    // should return WifiNetwork reviews that match the city, street and building number.
-    // the method currently does not compile, so it needs fixing.
-    // method should also check city, street and building number to not be null values,
-    // because otherwise the search will not be accurate.
-    // if arguments are null, throw ArgumentNullException.
     public async Task<List<WifiReview>> GetReviewsAsync(string city, string street, int buildingNumber)
     {
-        if (string.IsNullOrWhiteSpace(wifiId))
-            throw new ArgumentException("Wifi ID must be provided.", nameof(wifiId));
+        if (string.IsNullOrEmpty(city) || string.IsNullOrEmpty(street) || buildingNumber < 1)
+        {
+            throw new ArgumentException($"City ({city}), street ({street}), or building number ({buildingNumber}) values are invalid.");
+        }
+
+        List<WifiReview> reviewsList = await _wifiReviewRepository.GetReviewsByAddressAsync(city, street, buildingNumber);
         
-        var wifi = await _wifiRepository.GetByIdAsync(wifiId);
+        if (reviewsList == null || reviewsList.Count == 0)
+            throw new EmptyResponseException("");
         
-        if (wifi == null)
-            throw new KeyNotFoundException($"Wifi network with ID '{wifiId}' was not found.");
-        
-        return await _wifiReviewRepository.GetReviewsByWifiIdAsync(wifiId);
+        return reviewsList;
     }
 
     public async Task<WifiReview> AddReviewAsync(WifiReviewDto wifiReviewDto)
@@ -44,7 +42,7 @@ public class WifiReviewService : IWifiReviewService
 
         var newReview = new WifiReview
         {
-            Id = Guid.NewGuid().ToString(),
+            WifiId = ObjectId.GenerateNewId().ToString(),
             UserId = wifiReviewDto.UserId,
             Rating = (int)wifiReviewDto.Rating,
             Text = wifiReviewDto.Text,
@@ -53,7 +51,7 @@ public class WifiReviewService : IWifiReviewService
             BuildingNumber = (int)wifiReviewDto.BuildingNumber,
             CreatedAt = DateTime.UtcNow
         };
-
+        
         await _wifiReviewRepository.AddReviewAsync(newReview);
         return newReview;
     }
