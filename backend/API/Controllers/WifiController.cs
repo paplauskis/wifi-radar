@@ -1,4 +1,5 @@
 using API.Domain;
+using API.Domain.Exceptions;
 using API.Domain.Models;
 using API.Exceptions;
 using API.Services.Interfaces.Wifi;
@@ -30,11 +31,11 @@ public class WifiController : ControllerBase
             var reviews = await _wifiReviewService.GetReviewsAsync(city, street, buildingNumber);
             return Ok(reviews);
         }
-        catch (NotFoundException e)
+        catch (EmptyResponseException)
         {
-            return NotFound(e.Message);
+            return NoContent();
         }
-        catch (InvalidInputException e)
+        catch (ArgumentException e)
         {
             return BadRequest(e.Message);
         }
