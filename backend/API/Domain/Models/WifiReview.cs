@@ -70,8 +70,6 @@ public class WifiReview : TimeStampedEntity
         }
     }
     
-    // need to add null checks for the properties below
-    // if property is null, throw ArgumentNullException
     private string _city;
 
     [BsonElement("City")]
