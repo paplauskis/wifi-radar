@@ -13,7 +13,7 @@
 - GET api/user/{userId}/favorites
 - DELETE api/user/{userId}/favorites/{wifiId}
 - POST api/wifi/reviews (per body perduot WifiReviewDto)
-- GET api/wifi/reviews/{wifiId}?city={value}&street={value}&buildingNumber={value}
+- GET api/wifi/reviews?city={value}&street={value}&buildingNumber={value}
 - POST /api/wifi/password/{wifiId} (body - password, userId)
 - GET api/wifi/password/{wifiId}
 - POST api/user/auth/login (body - username, email)
