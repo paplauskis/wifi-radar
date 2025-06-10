@@ -23,9 +23,14 @@ public class WifiRepository : BaseRepository<WifiNetwork>, IWifiRepository
         await _collection.UpdateOneAsync(filter, update);
     }
 
-    public async Task AddPasswordAsync(string wifiId, string password)
+    public async Task AddPasswordAsync(string city, string street, int? buildingNumber, string password)
     {
-        var filter = Builders<WifiNetwork>.Filter.Eq(w => w.Id, wifiId);
+        var filter = Builders<WifiNetwork>.Filter.And(
+            Builders<WifiNetwork>.Filter.Eq(w => w.City, city),
+            Builders<WifiNetwork>.Filter.Eq(w => w.Street, street),
+            Builders<WifiNetwork>.Filter.Eq(w => w.BuildingNumber, buildingNumber)
+        );
+        
         var update = Builders<WifiNetwork>.Update.Push(w => w.Passwords, password);
         await _collection.UpdateOneAsync(filter, update);
     }
@@ -37,5 +42,10 @@ public class WifiRepository : BaseRepository<WifiNetwork>, IWifiRepository
 
         var result = await _collection.Find(filter).Project<WifiNetwork>(projection).FirstOrDefaultAsync();
         return result?.Passwords ?? new List<string>();
+    }
+
+    public async Task<List<string>> GetPasswordsByWifiAddressAsync(string city, string street, int buildingNumber)
+    {
+        throw new NotImplementedException();
     }
 }
