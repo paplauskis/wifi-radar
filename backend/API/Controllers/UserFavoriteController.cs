@@ -69,6 +69,7 @@ public class UserFavoriteController : ControllerBase
         }
     }
 
+    // this method does not work, needs to be fixed
     [HttpDelete("{userId}/favorites/{wifiId}")]
     public async Task<IActionResult> DeleteFavorite([FromRoute] string userId, [FromRoute] string wifiId)
     {
