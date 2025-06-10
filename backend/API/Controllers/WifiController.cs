@@ -71,12 +71,15 @@ public class WifiController : ControllerBase
         }
     }
 
-    [HttpGet("{wifiId}/password")]
-    public async Task<IActionResult> GetPasswords([FromRoute] string wifiId)
+    [HttpGet("passwords")]
+    public async Task<IActionResult> GetPasswords(
+        [FromQuery] string city, 
+        [FromQuery] string street, 
+        [FromQuery] int buildingNumber)
     {
         try
         {
-            var passwords = await _wifiPasswordSharingService.GetPasswordsAsync(wifiId);
+            var passwords = await _wifiPasswordSharingService.GetPasswordsAsync(city, street, buildingNumber);
             return Ok(passwords);
         }
         catch (NotFoundException e)
@@ -93,8 +96,8 @@ public class WifiController : ControllerBase
         }
     }
 
-    [HttpPost("{wifiId}/password")]
-    public async Task<IActionResult> AddPassword([FromRoute] string wifiId, [FromBody] PasswordDto passwordDto)
+    [HttpPost("passwords")]
+    public async Task<IActionResult> AddPassword([FromBody] PasswordDto passwordDto)
     {
         try
         {

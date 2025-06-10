@@ -1,5 +1,6 @@
 using API.Data.Repositories.Interfaces;
 using API.Domain;
+using API.Domain.Exceptions;
 using API.Services.Interfaces.Wifi;
 
 namespace API.Services.Wifi;
@@ -18,31 +19,40 @@ public class WifiPasswordSharingService : IWifiPasswordSharingService
         if (passwordDto == null)
             throw new ArgumentNullException(nameof(passwordDto));
 
-        if (string.IsNullOrWhiteSpace(passwordDto.WifiId))
-            throw new ArgumentException("Wifi ID is required.", nameof(passwordDto.WifiId));
+        if (
+            string.IsNullOrEmpty(passwordDto.City) || 
+            string.IsNullOrEmpty(passwordDto.Street) || 
+            passwordDto.BuildingNumber < 1)
+        {
+            throw new ArgumentException($"City ({passwordDto.City}), street ({passwordDto.Street}), or building number ({passwordDto.BuildingNumber}) values are invalid.");
+        }
 
-        if (string.IsNullOrWhiteSpace(passwordDto.Password))
+        if (string.IsNullOrEmpty(passwordDto.Password))
             throw new ArgumentException("Password cannot be empty.", nameof(passwordDto.Password));
 
-        var wifi = await _wifiRepository.GetByIdAsync(passwordDto.WifiId);
-        if (wifi == null)
-            throw new KeyNotFoundException($"Wifi network with ID '{passwordDto.WifiId}' not found.");
-
-        await _wifiRepository.AddPasswordAsync(passwordDto.WifiId, passwordDto.Password);
+        await _wifiRepository.AddPasswordAsync(
+            passwordDto.City,
+            passwordDto.Street,
+            passwordDto.BuildingNumber,
+            passwordDto.Password);
+        
         return passwordDto.Password;
     }
 
-    public async Task<List<string>> GetPasswordsAsync(string wifiId)
+    public async Task<List<string>> GetPasswordsAsync(string city, string street, int buildingNumber)
     {
-        if (string.IsNullOrWhiteSpace(wifiId))
-            throw new ArgumentException("Wifi ID is required.", nameof(wifiId));
+        if (string.IsNullOrEmpty(city) || string.IsNullOrEmpty(street) || buildingNumber < 1)
+        {
+            throw new ArgumentException($"City ({city}), street ({street}), or building number ({buildingNumber}) values are invalid.");
+        }
 
-        var wifi = await _wifiRepository.GetByIdAsync(wifiId);
-        if (wifi == null)
-            throw new KeyNotFoundException($"Wifi network with ID '{wifiId}' not found.");
+        var passwordsList = await 
+            _wifiRepository.GetPasswordsByWifiAddressAsync(city, street, buildingNumber);
 
-        var passwords = await _wifiRepository.GetPasswordsByWifiIdAsync(wifiId);
-        return (List<string>)passwords;
+        if (passwordsList == null || passwordsList.Count == 0)
+            throw new EmptyResponseException("");
+        
+        return passwordsList;
     }
 
     public async Task SharePasswordAsync(string wifiNetworkId, string password)
