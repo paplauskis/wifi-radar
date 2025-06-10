@@ -20,4 +20,15 @@ public class WifiReviewRepository : BaseRepository<WifiReview>, IWifiReviewRepos
         var filter = Builders<WifiReview>.Filter.Eq("WifiId", wifiId);
         return await _collection.Find(filter).ToListAsync();
     }
+
+    public async Task<List<WifiReview>> GetReviewsByAddressAsync(string city, string street, int buildingNumber)
+    {
+        var filter = Builders<WifiReview>.Filter.And(
+            Builders<WifiReview>.Filter.Eq(r => r.City, city),
+            Builders<WifiReview>.Filter.Eq(r => r.Street, street),
+            Builders<WifiReview>.Filter.Eq(r => r.BuildingNumber, buildingNumber)
+        );
+        
+        return await _collection.Find(filter).ToListAsync();
+    }
 }
