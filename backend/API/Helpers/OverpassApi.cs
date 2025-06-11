@@ -21,4 +21,16 @@ public static class OverpassApi
                $"(around:{radius},{lat},{lon});" +
                $"out body;";
     }
+
+    public static string WifiCoordinates(string city, string street, int buildingNumber)
+    {
+        return $"[out:json];\nnode\n  " +
+               $"[\"internet_access\"=\"wlan\"]\n  " +
+               $"[\"internet_access:fee\"=\"no\"]\n  " +
+               $"[\"addr:city\"=\"{city}\"]\n" +
+               $"[\"addr:street\"=\"{street}\"]\n" +
+               $"[\"addr:housenumber\"=\"{buildingNumber}\"];\n" +
+               $"out body;";
+    }
 }
+
