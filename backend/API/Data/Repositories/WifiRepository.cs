@@ -46,6 +46,15 @@ public class WifiRepository : BaseRepository<WifiNetwork>, IWifiRepository
 
     public async Task<List<string>> GetPasswordsByWifiAddressAsync(string city, string street, int buildingNumber)
     {
-        throw new NotImplementedException();
+        var filter = Builders<WifiNetwork>.Filter.And(
+            Builders<WifiNetwork>.Filter.Eq(w => w.City, city),
+            Builders<WifiNetwork>.Filter.Eq(w => w.Street, street),
+            Builders<WifiNetwork>.Filter.Eq(w => w.BuildingNumber, buildingNumber)
+            );
+
+        var projection = Builders<WifiNetwork>.Projection.Include(w => w.Passwords).Exclude("_id");
+
+        var result = await _collection.Find(filter).Project<WifiNetwork>(projection).FirstOrDefaultAsync();
+        return result?.Passwords ?? new List<string>();
     }
 }
