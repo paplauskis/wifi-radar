@@ -39,9 +39,9 @@ public class WifiController : ControllerBase
         {
             return BadRequest(e.Message);
         }
-        catch (Exception)
+        catch (Exception e)
         {
-            return StatusCode(500, "Unexpected server error occurred");
+            return StatusCode(500, "Unexpected server error occurred: " + e.Message);
         }
     }
 
@@ -53,17 +53,9 @@ public class WifiController : ControllerBase
             var review = await _wifiReviewService.AddReviewAsync(wifiReviewDto);
             return Ok(review);
         }
-        catch (NotFoundException e)
-        {
-            return NotFound(e.Message);
-        }
-        catch (InvalidInputException e)
+        catch (ArgumentNullException e)
         {
             return BadRequest(e.Message);
-        }
-        catch (ConflictException e)
-        {
-            return Conflict(e.Message);
         }
         catch (Exception)
         {
@@ -82,11 +74,11 @@ public class WifiController : ControllerBase
             var passwords = await _wifiPasswordSharingService.GetPasswordsAsync(city, street, buildingNumber);
             return Ok(passwords);
         }
-        catch (NotFoundException e)
+        catch (EmptyResponseException)
         {
-            return NotFound(e.Message);
+            return NoContent();
         }
-        catch (InvalidInputException e)
+        catch (ArgumentNullException e)
         {
             return BadRequest(e.Message);
         }
@@ -104,15 +96,11 @@ public class WifiController : ControllerBase
             var password = await _wifiPasswordSharingService.AddPasswordAsync(passwordDto);
             return Ok(password);
         }
-        catch (NotFoundException e)
+        catch (ArgumentNullException e)
         {
-            return NotFound(e.Message);
+            return BadRequest(e.Message);
         }
-        catch (ConflictException e)
-        {
-            return Conflict(e.Message);
-        }
-        catch (InvalidInputException e)
+        catch (ArgumentException e)
         {
             return BadRequest(e.Message);
         }
