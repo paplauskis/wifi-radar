@@ -27,15 +27,11 @@ public class UserFavoriteController : ControllerBase
         }
         catch (NotFoundException e)
         {
-            return NoContent();
+            return NotFound(e.Message);
         }
-        catch (InvalidInputException e)
+        catch (InvalidDataException e)
         {
             return BadRequest(e.Message);
-        }
-        catch (WifiNetworkAlreadyExistsException e)
-        {
-            return Conflict(e);
         }
         catch (Exception)
         {
@@ -51,17 +47,17 @@ public class UserFavoriteController : ControllerBase
             var addedFavorite = await _userFavoriteService.AddUserFavoriteAsync(userId, dto);
             return Ok(addedFavorite);
         }
-        catch (NotFoundException e)
-        {
-            return NotFound(e.Message);
-        }
-        catch (ConflictException e)
-        {
-            return Conflict(e.Message);
-        }
         catch (InvalidInputException e)
         {
             return BadRequest(e.Message);
+        }
+        catch (WifiNetworkAlreadyExistsException e)
+        {
+            return Conflict(e.Message);
+        }
+        catch (UserNotFoundException e)
+        {
+            return NotFound(e.Message);
         }
         catch (Exception)
         {
