@@ -17,7 +17,7 @@ public class WifiPasswordSharingService : IWifiPasswordSharingService
     public async Task<string> AddPasswordAsync(PasswordDto passwordDto)
     {
         if (passwordDto == null)
-            throw new ArgumentNullException(nameof(passwordDto));
+            throw new ArgumentNullException(nameof(passwordDto), "passwordDto is null");
 
         if (
             string.IsNullOrEmpty(passwordDto.City) || 
@@ -43,7 +43,7 @@ public class WifiPasswordSharingService : IWifiPasswordSharingService
     {
         if (string.IsNullOrEmpty(city) || string.IsNullOrEmpty(street) || buildingNumber < 1)
         {
-            throw new ArgumentException($"City ({city}), street ({street}), or building number ({buildingNumber}) values are invalid.");
+            throw new ArgumentNullException($"City ({city}), street ({street}), or building number ({buildingNumber}) values are invalid.");
         }
 
         var passwordsList = await 
