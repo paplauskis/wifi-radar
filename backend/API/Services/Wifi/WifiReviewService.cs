@@ -37,9 +37,9 @@ public class WifiReviewService : IWifiReviewService
     {
         if (wifiReviewDto == null)
         {
-            throw new ArgumentNullException(nameof(wifiReviewDto));
+            throw new ArgumentNullException(nameof(wifiReviewDto), "Passed in wifi object is null");
         }
-
+        
         var newReview = new WifiReview
         {
             WifiId = ObjectId.GenerateNewId().ToString(),
