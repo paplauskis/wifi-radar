@@ -38,6 +38,40 @@ public class MapService : IMapService
         return wifis;
     }
 
+    public async Task<CoordinateDto> GetCoordinates(string city, string street, int buildingNumber)
+    {
+        if (
+            string.IsNullOrEmpty(city) || 
+            string.IsNullOrEmpty(street) || 
+            buildingNumber < 1)
+        {
+            throw new ArgumentException("City, street or building number value is null or empty");
+        }
+        
+        var content = new StringContent(
+            OverpassApi.WifiCoordinates(city, street, buildingNumber), 
+            Encoding.UTF8, 
+            "application/json");
+
+        var responseDto = await PostResponseOverpassApi(content);
+
+        if (responseDto == null)
+            throw new ArgumentNullException(nameof(responseDto));
+        
+        if (responseDto.Elements.Count == 0)
+            throw new EmptyResponseException("No network was found with this address");
+        
+        if (responseDto.Elements.Count > 1)
+            throw new ArgumentException("Multiple networks were found with this address, should be 1");
+        
+        
+        return new CoordinateDto
+        {
+            Latitude = responseDto.Elements[0].Latitude.ToString(), 
+            Longitude = responseDto.Elements[0].Longitude.ToString()
+        };
+    }
+
     private async Task<List<OverpassResponseElementDto>> SearchInCity(string city)
     {
         List<OverpassResponseElementDto> wifis = new();
