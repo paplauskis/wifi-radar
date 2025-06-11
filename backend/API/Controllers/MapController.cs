@@ -40,4 +40,21 @@ public class MapController : ControllerBase
             return StatusCode(500, $"Unexpected error occured: {e.Message}");
         }
     }
+
+    [HttpGet("coordinates")]
+    public async Task<IActionResult> GetCoordinates(
+        [FromQuery] string city,
+        [FromQuery] string street,
+        [FromQuery] int buildingNumber)
+    {
+        try
+        {
+            var dto = await _mapService.GetCoordinates(city, street, buildingNumber);
+            return Ok(dto);
+        }
+        catch (Exception e) // specific exception handling will be implemented later
+        {
+            return BadRequest(e.Message);
+        }
+    }
 }
