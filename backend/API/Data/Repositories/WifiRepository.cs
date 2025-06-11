@@ -38,4 +38,17 @@ public class WifiRepository : BaseRepository<WifiNetwork>, IWifiRepository
         var result = await _collection.Find(filter).Project<WifiNetwork>(projection).FirstOrDefaultAsync();
         return result?.Passwords ?? new List<string>();
     }
+
+    public async Task<IEnumerable<string>> GetPasswordsByWifiAddressAsync(string street, int buildingNumber)
+    {
+        var filter = Builders<WifiNetwork>.Filter.And(
+            Builders<WifiNetwork>.Filter.Eq(w => w.Street, street),
+            Builders<WifiNetwork>.Filter.Eq(w => w.BuildingNumber, buildingNumber)
+            );
+
+        var projection = Builders<WifiNetwork>.Projection.Include(w => w.Passwords).Exclude("_id");
+
+        var result = await _collection.Find(filter).Project<WifiNetwork>(projection).FirstOrDefaultAsync();
+        return result?.Passwords ?? new List<string>();
+    }
 }
