@@ -52,9 +52,21 @@ public class MapController : ControllerBase
             var dto = await _mapService.GetCoordinates(city, street, buildingNumber);
             return Ok(dto);
         }
-        catch (Exception e) // specific exception handling will be implemented later
+        catch (EmptyResponseException e)
+        {
+            return NoContent();
+        }
+        catch (ArgumentNullException e)
+        {
+            return BadRequest("Could not get coordinates from this address" + e.Message);
+        }
+        catch (ArgumentException e)
         {
             return BadRequest(e.Message);
+        }
+        catch (Exception e)
+        {
+            return StatusCode(500, e.Message);
         }
     }
 }
