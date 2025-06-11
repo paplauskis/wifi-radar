@@ -54,15 +54,12 @@ namespace API.Services.Users
             // if the WifiNetwork exists, the doesWifiAlreadyExist variable should be true
             bool doesWifiAlreadyExist = false;
             if (doesWifiAlreadyExist)
-                throw new WifiNetworkAlreadyExistsException("Wifi network already exists.", wifi);
+                throw new WifiNetworkAlreadyExistsException("Wifi network is already saved to favorites by this user.", wifi);
 
             var user = await _users.Find(u => u.Id == userId).FirstOrDefaultAsync();
             if (user == null)
-                throw new UserNotFoundException(userId);
-
-            if (user.FavoriteNetworkId != null && user.FavoriteNetworkId.Contains(wifi.WifiId))
-                throw new ConflictException("The same wifi network already is saved by this user");
-
+                throw new UserNotFoundException($"user with id {userId} could not be found.");
+            
             var filter = Builders<User>.Filter.Eq(u => u.Id, userId);
             var update = Builders<User>.Update.AddToSet(u => u.FavoriteNetworkId, wifi.WifiId);
             await _users.UpdateOneAsync(filter, update);
