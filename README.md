@@ -58,3 +58,40 @@ Story: Wifi informacija
 Kaip naudotojas, 
 noriu matyti tinklų parsisiuntimo ir įkėlimo greičius,
 kad galėčiau įvertinti mano lūkesčius atitinkančius wi-fi tinklus
+
+## REST Principles
+
+API atitinka Richardson Maturity Model:
+
+1. **Level 1 - Resources**
+   - Each endpoint represents a resource
+   - URLs are resource-oriented
+
+2. **Level 2 - HTTP Verbs**
+   - GET: Retrieve resources
+   - POST: Create resources
+   - DELETE: Remove resources
+   - Proper status codes (200, 201, 204, 400, 401, 404, 409, 500)
+
+3. **Level 3 - HATEOAS**
+   - Self-links in responses
+   - Resource relationships
+
+### Response Format
+
+- Success responses include data and self-links
+- Error responses include message and status code
+- All responses are wrapped in a standard envelope
+
+## Exception Handling
+
+The API uses centralized exception handling through middleware. Common exceptions are mapped to appropriate HTTP status codes:
+
+| Exception Type | HTTP Status | Description |
+|----------------|-------------|-------------|
+| ArgumentException | 400 | Invalid input parameters |
+| UnauthorizedAccessException | 401 | Authentication failed |
+| NotFoundException | 404 | Resource not found |
+| ConflictException | 409 | Resource conflict |
+| EmptyResponseException | 204 | No content available |
+| Other Exceptions | 500 | Unexpected server error |

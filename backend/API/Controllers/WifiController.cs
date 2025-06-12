@@ -1,7 +1,6 @@
 using API.Domain;
-using API.Domain.Exceptions;
 using API.Domain.Models;
-using API.Exceptions;
+using API.Models;
 using API.Services.Interfaces.Wifi;
 using Microsoft.AspNetCore.Mvc;
 
@@ -21,92 +20,96 @@ public class WifiController : ControllerBase
     }
 
     [HttpGet("reviews")]
+    [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status204NoContent)]
+    [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status500InternalServerError)]
     public async Task<IActionResult> GetWifiReviews(
         [FromQuery] string city, 
         [FromQuery] string street, 
         [FromQuery] int buildingNumber)
     {
-        try
-        {
-            var reviews = await _wifiReviewService.GetReviewsAsync(city, street, buildingNumber);
-            return Ok(reviews);
-        }
-        catch (EmptyResponseException)
+        var reviews = await _wifiReviewService.GetReviewsAsync(city, street, buildingNumber);
+        if (reviews == null || !reviews.Any())
         {
             return NoContent();
         }
-        catch (ArgumentException e)
+
+        var response = new ApiResponse<object>
         {
-            return BadRequest(e.Message);
-        }
-        catch (Exception e)
-        {
-            return StatusCode(500, "Unexpected server error occurred: " + e.Message);
-        }
+            Success = true,
+            Data = reviews,
+            Links = new Dictionary<string, string>
+            {
+                { "self", $"/api/wifi/reviews?city={city}&street={street}&buildingNumber={buildingNumber}" }
+            }
+        };
+        return Ok(response);
     }
 
     [HttpPost("reviews")]
+    [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status201Created)]
+    [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status500InternalServerError)]
     public async Task<IActionResult> AddWifiReview([FromBody] WifiReviewDto wifiReviewDto)
     {
-        try
+        var review = await _wifiReviewService.AddReviewAsync(wifiReviewDto);
+        var response = new ApiResponse<object>
         {
-            var review = await _wifiReviewService.AddReviewAsync(wifiReviewDto);
-            return Ok(review);
-        }
-        catch (ArgumentNullException e)
-        {
-            return BadRequest(e.Message);
-        }
-        catch (Exception)
-        {
-            return StatusCode(500, "Unexpected server error occurred");
-        }
+            Success = true,
+            Data = review,
+            Links = new Dictionary<string, string>
+            {
+                { "self", $"/api/wifi/reviews/{review.Id}" }
+            }
+        };
+        return CreatedAtAction(nameof(GetWifiReviews), new { city = review.City, street = review.Street, buildingNumber = review.BuildingNumber }, response);
     }
 
     [HttpGet("passwords")]
+    [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status204NoContent)]
+    [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status500InternalServerError)]
     public async Task<IActionResult> GetPasswords(
         [FromQuery] string city, 
         [FromQuery] string street, 
         [FromQuery] int buildingNumber)
     {
-        try
-        {
-            var passwords = await _wifiPasswordSharingService.GetPasswordsAsync(city, street, buildingNumber);
-            return Ok(passwords);
-        }
-        catch (EmptyResponseException)
+        var passwords = await _wifiPasswordSharingService.GetPasswordsAsync(city, street, buildingNumber);
+        if (passwords == null || !passwords.Any())
         {
             return NoContent();
         }
-        catch (ArgumentNullException e)
+
+        var response = new ApiResponse<object>
         {
-            return BadRequest(e.Message);
-        }
-        catch (Exception)
-        {
-            return StatusCode(500, "Unexpected server error occurred");
-        }
+            Success = true,
+            Data = passwords,
+            Links = new Dictionary<string, string>
+            {
+                { "self", $"/api/wifi/passwords?city={city}&street={street}&buildingNumber={buildingNumber}" }
+            }
+        };
+        return Ok(response);
     }
 
     [HttpPost("passwords")]
+    [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status201Created)]
+    [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status500InternalServerError)]
     public async Task<IActionResult> AddPassword([FromBody] PasswordDto passwordDto)
     {
-        try
+        var password = await _wifiPasswordSharingService.AddPasswordAsync(passwordDto);
+        var response = new ApiResponse<object>
         {
-            var password = await _wifiPasswordSharingService.AddPasswordAsync(passwordDto);
-            return Ok(password);
-        }
-        catch (ArgumentNullException e)
-        {
-            return BadRequest(e.Message);
-        }
-        catch (ArgumentException e)
-        {
-            return BadRequest(e.Message);
-        }
-        catch (Exception)
-        {
-            return StatusCode(500, "Unexpected server error occurred");
-        }
+            Success = true,
+            Data = password,
+            Links = new Dictionary<string, string>
+            {
+                { "self", $"/api/wifi/passwords?city={passwordDto.City}&street={passwordDto.Street}&buildingNumber={passwordDto.BuildingNumber}" }
+            }
+        };
+        return CreatedAtAction(nameof(GetPasswords), new { city = passwordDto.City, street = passwordDto.Street, buildingNumber = passwordDto.BuildingNumber }, response);
     }
 }

@@ -15,6 +15,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.IdentityModel.Tokens;
 using MongoDB.Driver;
+using API.Middleware;
 
 public class Program
 {
@@ -89,6 +90,8 @@ public class Program
 
         app.UseAuthorization();
         app.UseAuthentication();
+
+        app.UseMiddleware<ExceptionHandlingMiddleware>();
 
         app.MapControllers();
 
