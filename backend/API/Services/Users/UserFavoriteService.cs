@@ -50,9 +50,14 @@ namespace API.Services.Users
             if (wifi == null || string.IsNullOrWhiteSpace(wifi.WifiId))
                 wifi.WifiId = ObjectId.GenerateNewId().ToString();
 
-            // should check if a WifiNetwork with the same City, Street and BuildingNumber is already saved by the user
-            // if the WifiNetwork exists, the doesWifiAlreadyExist variable should be true
-            bool doesWifiAlreadyExist = false;
+            var existingWifi = await _wifiNetworks.Find(w =>
+            w.Id == userId &&
+            w.City == wifi.City &&
+            w.Street == wifi.Street &&
+            w.BuildingNumber == wifi.BuildingNumber
+            ).FirstOrDefaultAsync();
+
+            bool doesWifiAlreadyExist = existingWifi != null;
             if (doesWifiAlreadyExist)
                 throw new WifiNetworkAlreadyExistsException("Wifi network is already saved to favorites by this user.", wifi);
 
