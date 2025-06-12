@@ -50,16 +50,16 @@ namespace API.Services.Users
             if (wifi == null || string.IsNullOrWhiteSpace(wifi.WifiId))
                 wifi.WifiId = ObjectId.GenerateNewId().ToString();
 
-            var existingWifi = await _wifiNetworks.Find(w =>
-            w.Id == userId &&
-            w.City == wifi.City &&
-            w.Street == wifi.Street &&
-            w.BuildingNumber == wifi.BuildingNumber
-            ).FirstOrDefaultAsync();
+            // var existingWifi = await _wifiNetworks.Find(w =>
+            // w.Id == userId &&
+            // w.City == wifi.City &&
+            // w.Street == wifi.Street &&
+            // w.BuildingNumber == wifi.BuildingNumber
+            // ).FirstOrDefaultAsync();
 
-            bool doesWifiAlreadyExist = existingWifi != null;
-            if (doesWifiAlreadyExist)
-                throw new ConflictException("Wifi network is already saved to favorites by this user.");
+            // bool doesWifiAlreadyExist = existingWifi != null;
+            // if (doesWifiAlreadyExist)
+            //     throw new ConflictException("Wifi network is already saved to favorites by this user.");
 
             var user = await _userRepository.FindById(userId);
             if (user == null)
