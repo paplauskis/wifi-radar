@@ -1,6 +1,5 @@
 using API.Domain.Dto;
-using API.Domain.Exceptions;
-using API.Exceptions;
+using API.Models;
 using API.Services.Interfaces.User;
 using Microsoft.AspNetCore.Mvc;
 
@@ -18,73 +17,54 @@ public class UserFavoriteController : ControllerBase
     }
 
     [HttpGet("{userId}/favorites")]
+    [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status404NotFound)]
+    [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status500InternalServerError)]
     public async Task<IActionResult> GetFavorites([FromRoute] string userId)
     {
-        try
+        var favorites = await _userFavoriteService.GetUserFavoritesAsync(userId);
+        var response = new ApiResponse<object>
         {
-            var favorites = await _userFavoriteService.GetUserFavoritesAsync(userId);
-            return Ok(favorites);
-        }
-        catch (NotFoundException e)
-        {
-            return NotFound(e.Message);
-        }
-        catch (InvalidDataException e)
-        {
-            return BadRequest(e.Message);
-        }
-        catch (Exception)
-        {
-            return StatusCode(500, "Unexpected server error occurred");
-        }
+            Success = true,
+            Data = favorites,
+            Links = new Dictionary<string, string>
+            {
+                { "self", $"/api/user/{userId}/favorites" }
+            }
+        };
+        return Ok(response);
     }
 
     [HttpPost("{userId}/favorites")]
+    [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status201Created)]
+    [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status409Conflict)]
+    [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status404NotFound)]
+    [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status500InternalServerError)]
     public async Task<IActionResult> AddFavorite([FromRoute] string userId, [FromBody] WifiNetworkDto dto)
     {
-        try
+        var addedFavorite = await _userFavoriteService.AddUserFavoriteAsync(userId, dto);
+        var response = new ApiResponse<object>
         {
-            var addedFavorite = await _userFavoriteService.AddUserFavoriteAsync(userId, dto);
-            return Ok(addedFavorite);
-        }
-        catch (InvalidInputException e)
-        {
-            return BadRequest(e.Message);
-        }
-        catch (WifiNetworkAlreadyExistsException e)
-        {
-            return Conflict(e.Message);
-        }
-        catch (UserNotFoundException e)
-        {
-            return NotFound(e.Message);
-        }
-        catch (Exception)
-        {
-            return StatusCode(500, "Unexpected server error occurred");
-        }
+            Success = true,
+            Data = addedFavorite,
+            Links = new Dictionary<string, string>
+            {
+                { "self", $"/api/user/{userId}/favorites/{dto.WifiId}" }
+            }
+        };
+        return CreatedAtAction(nameof(GetFavorites), new { userId }, response);
     }
 
-    // this method does not work, needs to be fixed
     [HttpDelete("{userId}/favorites/{wifiId}")]
+    [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status204NoContent)]
+    [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status404NotFound)]
+    [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status500InternalServerError)]
     public async Task<IActionResult> DeleteFavorite([FromRoute] string userId, [FromRoute] string wifiId)
     {
-        try
-        { 
-            await _userFavoriteService.DeleteUserFavoriteAsync(userId, wifiId);
-            return Ok();
-        }
-        catch (NotFoundException e)
-        {
-            return NotFound(e.Message);
-        }
-        catch (InvalidInputException e)
-        {
-            return BadRequest(e.Message);
-        }
-        catch (Exception)
-        {
-            return StatusCode(500, "Unexpected server error occurred");
-        }
+        await _userFavoriteService.DeleteUserFavoriteAsync(userId, wifiId);
+        return NoContent();
     }
 }

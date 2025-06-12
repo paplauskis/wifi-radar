@@ -1,4 +1,5 @@
 using API.Domain.Exceptions;
+using API.Models;
 using API.Services.Interfaces.Map;
 using Microsoft.AspNetCore.Mvc;
 
@@ -16,57 +17,55 @@ public class MapController : ControllerBase
     }
     
     [HttpGet("search")]
+    [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status204NoContent)]
+    [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status500InternalServerError)]
     public async Task<IActionResult> Search([FromQuery] string city, [FromQuery] int? radius) //radius in meters
     {
-        try
-        {
-            var wifis = await _mapService.Search(city, radius);
-            return Ok(wifis);
-        }
-        catch (ArgumentNullException ane)
-        {
-            return BadRequest(ane.Message);
-        }
-        catch (ArgumentException ae)
-        {
-            return BadRequest(ae.Message);
-        }
-        catch (EmptyResponseException)
+        var wifis = await _mapService.Search(city, radius);
+        if (wifis == null || !wifis.Any())
         {
             return NoContent();
         }
-        catch (Exception e)
+
+        var response = new ApiResponse<object>
         {
-            return StatusCode(500, $"Unexpected error occured: {e.Message}");
-        }
+            Success = true,
+            Data = wifis,
+            Links = new Dictionary<string, string>
+            {
+                { "self", $"/api/map/search?city={city}&radius={radius}" }
+            }
+        };
+        return Ok(response);
     }
 
     [HttpGet("coordinates")]
+    [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status204NoContent)]
+    [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status500InternalServerError)]
     public async Task<IActionResult> GetCoordinates(
         [FromQuery] string city,
         [FromQuery] string street,
         [FromQuery] int buildingNumber)
     {
-        try
-        {
-            var dto = await _mapService.GetCoordinates(city, street, buildingNumber);
-            return Ok(dto);
-        }
-        catch (EmptyResponseException e)
+        var dto = await _mapService.GetCoordinates(city, street, buildingNumber);
+        if (dto == null)
         {
             return NoContent();
         }
-        catch (ArgumentNullException e)
+
+        var response = new ApiResponse<object>
         {
-            return BadRequest("Could not get coordinates from this address" + e.Message);
-        }
-        catch (ArgumentException e)
-        {
-            return BadRequest(e.Message);
-        }
-        catch (Exception e)
-        {
-            return StatusCode(500, e.Message);
-        }
+            Success = true,
+            Data = dto,
+            Links = new Dictionary<string, string>
+            {
+                { "self", $"/api/map/coordinates?city={city}&street={street}&buildingNumber={buildingNumber}" }
+            }
+        };
+        return Ok(response);
     }
 }

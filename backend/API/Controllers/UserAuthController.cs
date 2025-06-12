@@ -1,5 +1,5 @@
 using API.Domain.Dto;
-using API.Domain.Exceptions;
+using API.Models;
 using API.Services.Interfaces.User;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -19,46 +19,41 @@ public class UserAuthController : ControllerBase
     }
     
     [HttpPost("login")]
+    [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status500InternalServerError)]
     public async Task<IActionResult> Login([FromBody] UserLoginRequestDto userRequestDto)
     {
-        try
+        var response = await _userAuthService.HandleUserLogin(userRequestDto);
+        var apiResponse = new ApiResponse<object>
         {
-            var response = await _userAuthService.HandleUserLogin(userRequestDto);
-            return Ok(response);
-        }
-        catch (UnauthorizedAccessException uae)
-        {
-            return Unauthorized(uae.Message);
-        }
-        catch (Exception e)
-        {
-            return StatusCode(500, $"Unexpected error occured: {e.Message}");
-        }
+            Success = true,
+            Data = response,
+            Links = new Dictionary<string, string>
+            {
+                { "self", "/api/user/auth/login" }
+            }
+        };
+        return Ok(apiResponse);
     }
     
     [HttpPost("register")]
+    [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status201Created)]
+    [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status409Conflict)]
+    [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status500InternalServerError)]
     public async Task<IActionResult> Register([FromBody] UserLoginRequestDto userRequestDto)
     {
-        try
+        var response = await _userAuthService.HandleUserRegistration(userRequestDto);
+        var apiResponse = new ApiResponse<object>
         {
-            var response = await _userAuthService.HandleUserRegistration(userRequestDto);
-            return Ok(response);
-        }
-        catch (UserAlreadyExistsException uaee)
-        {
-            return Conflict(uaee.Message);
-        }
-        catch (ArgumentNullException ane)
-        {
-            return BadRequest(ane.Message);
-        }
-        catch (ArgumentException ae)
-        {
-            return BadRequest(ae.Message);
-        }
-        catch (Exception e)
-        {
-            return StatusCode(500, $"Unexpected error occured: {e.Message}");
-        }
+            Success = true,
+            Data = response,
+            Links = new Dictionary<string, string>
+            {
+                { "self", "/api/user/auth/register" }
+            }
+        };
+        return CreatedAtAction(nameof(Login), null, apiResponse);
     }
 }
