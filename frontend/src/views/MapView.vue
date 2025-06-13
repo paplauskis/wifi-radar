@@ -29,7 +29,6 @@ import { ref, onMounted, watch } from 'vue'
 import L from 'leaflet'
 import 'leaflet/dist/leaflet.css'
 import { geocodeCity } from '@/services/geocoding'
-import { fetchWifiNodes } from '@/services/overpass'
 
 import WifiSearchBar from '@/components/wifi/WifiSearchBar.vue'
 import WifiList from '@/components/wifi/WifiList.vue'
@@ -67,7 +66,7 @@ const selectWifi = (wifi) => {
     </div>
   `
 
-  const popup = L.popup({
+  L.popup({
     offset: L.point(0, -20),
   })
     .setLatLng([wifi.lat, wifi.lng])
@@ -94,23 +93,43 @@ watch(searchQuery, (newQuery) => {
     if (result) {
       map.setView([result.lat, result.lon], 14)
 
-      const hotspots = await fetchWifiNodes(result.lat, result.lon)
-      wifiPoints.value = hotspots.map((node) => {
-        const tags = node.tags || {}
-        const address = [tags['addr:street'], tags['addr:housenumber'], tags['addr:city']]
-          .filter(Boolean)
-          .join(', ')
-
-        return {
-          id: node.id,
-          name: tags.name || 'Unnamed hotspot',
-          provider: tags.operator || 'Unknown provider',
-          password: tags['internet_access:ssid'] || null,
-          address: address || 'No address info',
-          lat: node.lat,
-          lng: node.lon,
-        }
+      // Get city name from geocode result
+      const city = result.address?.city || result.display_name.split(',')[0]
+      
+      // Call our backend endpoint
+      const response = await fetch(`http://localhost:5274/api/map/search?city=${encodeURIComponent(city)}&radius=2000`, {
+        headers: {
+          'Accept': 'application/json',
+        },
       })
+      
+      if (!response.ok) {
+        console.error('Failed to fetch WiFi data:', response.status, response.statusText)
+        wifiPoints.value = []
+        return
+      }
+
+      const data = await response.json()
+      
+      if (!data.success) {
+        wifiPoints.value = []
+        return
+      }
+          wifiPoints.value = data.data.map((wifi) => {
+      const tags = wifi.tags || {};
+      return {
+        id: wifi.id,
+        name: tags.name || 'Unnamed hotspot',
+        provider: tags.operator || 'Unknown provider',
+        password: tags['internet_access:ssid'] || null,
+        address: [tags['addr:street'], tags['addr:housenumber'], tags['addr:city']].filter(Boolean).join(', ') || 'No address info',
+        lat: wifi.lat,
+        lng: wifi.lon,
+        city: tags['addr:city'],
+        street: tags['addr:street'],
+        buildingNumber: tags['addr:housenumber'],
+      }
+    })
 
       window.addEventListener('select-wifi', (e) => {
         const id = e.detail

@@ -41,7 +41,7 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref, onMounted, watch } from 'vue'
 import WifiPasswordList from './WifiPasswordList.vue'
 import WifiReviewList from './WifiReviewList.vue'
 
@@ -51,8 +51,6 @@ const props = defineProps({
     required: true,
   },
 })
-
-const emit = defineEmits(['back'])
 
 const isFavorite = ref(false)
 
@@ -64,21 +62,34 @@ const sharePassword = (entry) => {
   console.log('Submitted password:', entry)
 }
 
-// Dummy
-const reviews = ref([
-  {
-    user: 'Jonas P.',
-    rating: 4,
-    comment: 'Pretty fast internet and stable connection.',
-    date: new Date().toISOString(),
-  },
-  {
-    user: 'Agnė K.',
-    rating: 2,
-    comment: 'Had some connection drops.',
-    date: new Date(Date.now() - 86400000).toISOString(),
-  },
-])
+const reviews = ref([])
+
+async function fetchReviews() {
+  if (!props.wifi) return
+  // Extract city, street, buildingNumber from wifi.address or wifi object
+  const { city, street, buildingNumber } = props.wifi
+  if (!city || !street || !buildingNumber) return
+  const url = `http://localhost:5274/api/wifi/reviews?city=${encodeURIComponent(city)}&street=${encodeURIComponent(street)}&buildingNumber=${encodeURIComponent(buildingNumber)}`
+  try {
+    const res = await fetch(url)
+    const data = await res.json()
+    if (res.ok && data.success && Array.isArray(data.data)) {
+      reviews.value = data.data.map(r => ({
+        user: r.user || 'Anonymous',
+        rating: r.rating,
+        comment: r.comment,
+        date: r.date || new Date().toISOString(),
+      }))
+    } else {
+      reviews.value = []
+    }
+  } catch {
+    reviews.value = []
+  }
+}
+
+onMounted(fetchReviews)
+watch(() => props.wifi, fetchReviews, { immediate: true })
 
 const newReview = ref({
   rating: 0,

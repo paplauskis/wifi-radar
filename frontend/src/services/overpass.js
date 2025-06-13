@@ -1,4 +1,4 @@
-const OVERPASS_URL = 'https://overpass-api.de/api/interpreter'
+const API_URL = 'http://localhost:44304/api/map'
 
 /**
  * @param {number} lat - Center latitude
@@ -9,23 +9,20 @@ const OVERPASS_URL = 'https://overpass-api.de/api/interpreter'
 export async function fetchWifiNodes(lat, lon, radiusKm = 2) {
   const radiusMeters = radiusKm * 1000
 
-  const query = `
-    [out:json];
-    node
-      ["internet_access"="wlan"]
-      (around:${radiusMeters},${lat},${lon});
-    out body;
-  `
+  const url = new URL(`${API_URL}/search`)
+  url.searchParams.set('city', 'Vilnius') // TODO: Get city from coordinates
+  url.searchParams.set('radius', radiusMeters.toString())
 
-  const res = await fetch(OVERPASS_URL, {
-    method: 'POST',
+  const res = await fetch(url.toString(), {
     headers: {
-      'Content-Type': 'application/x-www-form-urlencoded',
       'User-Agent': 'wifi-radar-collage-project/1.0',
     },
-    body: `data=${encodeURIComponent(query)}`,
   })
 
+  if (!res.ok) {
+    return []
+  }
+
   const data = await res.json()
-  return data.elements || []
+  return data.data || []
 }
