@@ -7,12 +7,14 @@
 
             <v-card-text>
                 <v-form @submit.prevent="handleLogin" ref="form">
-                    <v-text-field v-model="email" label="Email" type="email" required prepend-inner-icon="mdi-email" />
+                    <v-text-field v-model="username" label="Username" required prepend-inner-icon="mdi-account" />
 
                     <v-text-field v-model="password" label="Password" type="password" required
                         prepend-inner-icon="mdi-lock" />
 
                     <v-checkbox v-model="remember" label="Remember me" color="primary" />
+
+                    <v-alert v-if="loginError" type="error" class="mb-2">{{ loginError }}</v-alert>
 
                     <v-btn color="primary" class="mt-4" type="submit" block>
                         Login
@@ -32,15 +34,31 @@
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 
-const email = ref('')
+const username = ref('')
 const password = ref('')
 const remember = ref(false)
+const loginError = ref('')
 
 const router = useRouter()
 
-const handleLogin = () => {
-    console.log('Logging in:', email.value, password.value)
-    router.push('/map')
+const handleLogin = async () => {
+  loginError.value = ''
+  try {
+    const res = await fetch('http://localhost:5274/api/user/auth/login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ username: username.value, password: password.value }),
+    })
+    const data = await res.json()
+    if (res.ok && data.success && data.data?.accessToken) {
+      localStorage.setItem('accessToken', data.data.accessToken)
+      router.push('/map')
+    } else {
+      loginError.value = data.message || 'Login failed'
+    }
+  } catch {
+    loginError.value = 'Network error'
+  }
 }
 </script>
 
