@@ -48,7 +48,7 @@ public class WifiReview : TimeStampedEntity
         get => _text;
         set
         {
-            if (!string.IsNullOrEmpty(value) && (value.Length < 5 || value.Length > 100))
+            if (value != null && (value.Length < 5 || value.Length > 100))
             {
                 throw new ArgumentException("Text must be between 5 and 100 characters long");
             }
@@ -78,8 +78,8 @@ public class WifiReview : TimeStampedEntity
         get => _city;
         set
         {
-            if (string.IsNullOrEmpty(value))
-                throw new ArgumentNullException(nameof(value));
+            if (string.IsNullOrWhiteSpace(value))
+                throw new ArgumentNullException("City cannot be set to null, be empty or consists only of whitespaces");
             
             if (value.Length > 100)
                 throw new ArgumentException("City name length must be less than 100 characters");
@@ -96,8 +96,8 @@ public class WifiReview : TimeStampedEntity
         get => _street;
         set
         {
-            if (string.IsNullOrEmpty(value))
-                throw new ArgumentNullException(nameof(value));
+            if (string.IsNullOrWhiteSpace(value))
+                throw new ArgumentNullException("Street cannot be set to null, be empty or consists only of whitespaces");
             
             if (value.Length > 100)
                 throw new ArgumentException("Street name length must be less than 100 characters");
