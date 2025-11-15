@@ -63,7 +63,6 @@ public class WifiReviewTests
 
         if (property.Name == "Id" && value == null)
         {
-            
             property.SetValue(wifi, value);
             return;
         }
@@ -80,6 +79,12 @@ public class WifiReviewTests
                 case "Text":
                     Assert.Contains("Text must be between 5 and 100 characters", argEx.Message);
                     break;
+                case "BuildingNumber":
+                    Assert.Contains("Invalid building number", argEx.Message);
+                    break;
+                case "Street":
+                    Assert.Contains("Street cannot be set to", argEx.Message);
+                    break;
                 default:
                     Assert.Contains($"{property.Name} cannot be set to", argEx.Message);
                     break;
@@ -87,7 +92,7 @@ public class WifiReviewTests
         }
         else
         {
-            Assert.IsType<ArgumentException>(exception);
+            Assert.IsType<ArgumentNullException>(exception);
         }
     }
 }
